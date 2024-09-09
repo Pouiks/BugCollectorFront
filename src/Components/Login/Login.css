@@ -1,0 +1,42 @@
+body {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: linear-gradient(to right, #1a73e8, #1a2a6c);
+  }
+  
+  .Card_Container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 800px;
+    height: 500px;
+    background-color: #e0e0d9;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden; /* Ensure child elements don't overflow */
+  }
+  
+  .Card_Container-first {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%); /* Center the container */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .Card_Container-second {
+    flex: 1;
+    background: transparent;
+    display: none; /* Currently empty */
+  }
+  

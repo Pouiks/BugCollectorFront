@@ -1,0 +1,166 @@
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(to right, #1a73e8, #1a2a6c);
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  padding: 20px; /* Added padding for smaller screens */
+}
+
+.login-card {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 40px 30px;
+  border-radius: 10px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 350px; /* Limit the width for larger screens */
+  text-align: center;
+  color: #fff;
+  backdrop-filter: blur(8px);
+}
+
+.login-card h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+}
+
+.input-container {
+  position: relative;
+  margin-bottom: 25px;
+  width: 100%; /* Ensuring full width */
+  text-align: left; /* Aligning text left */
+}
+
+.input-container label {
+  display: block;
+  margin-bottom: 5px;
+  color: #fff; /* Color for label */
+  font-size: 14px;
+}
+
+.input-container input {
+  width: calc(100% - 30px); /* Reduced width for better layout */
+  padding: 12px 15px;
+  background-color: rgba(255, 255, 255, 0.8);
+  border: none;
+  outline: none;
+  color: #333;
+  border-radius: 5px;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.login-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #4285f4;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 20px;
+}
+
+.login-button:hover {
+  background-color: #357ae8;
+}
+
+.forgot-password,
+.signup-link {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #ddd;
+}
+
+.signup-link a,
+.forgot-password a {
+  color: #4285f4;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.signup-link a:hover,
+.forgot-password a:hover {
+  text-decoration: underline;
+}
+
+.remember-me {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #fff;
+  text-align: left;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  color: #ff4d4f;
+  margin-bottom: 20px;
+  font-size: 14px;
+  text-align: left;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+  .login-card {
+    width: 100%;
+    padding: 30px 20px;
+    margin: 20px;
+  }
+
+  .login-card h2 {
+    font-size: 20px;
+  }
+
+  .input-container input {
+    font-size: 14px;
+  }
+
+  .login-button {
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .forgot-password,
+  .signup-link {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    width: 100%;
+    padding: 20px 10px;
+  }
+
+  .login-card h2 {
+    font-size: 18px;
+  }
+
+  .input-container input {
+    font-size: 12px;
+  }
+
+  .login-button {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .forgot-password,
+  .signup-link {
+    font-size: 10px;
+  }
+}
