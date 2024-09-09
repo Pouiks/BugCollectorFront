@@ -36,7 +36,7 @@ const UserList = () => {
                   value={new Date(user.license.endDate).toISOString().split('T')[0]} 
                   onChange={(e) => {
                     const newDate = e.target.value;
-                    setUsers(users.map(u => u._id === user._id ? { ...u, license: { ...u.license, endDate: new Date(newDate) } } : u));
+                    setUsers(users.map(u => u._id === user._id ?  { ...u,  license: { ...u.license, endDate: new Date(newDate) } } : u));
                   }} 
                 />
               </td>
