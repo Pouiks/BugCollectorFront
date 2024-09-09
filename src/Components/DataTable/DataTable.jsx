@@ -12,6 +12,7 @@ const DataTable = () => {
       try {
         const response = await fetch('http://localhost:3000/api/bugs');  // Remplace par ton URL d'API
         const result = await response.json();  // Parse les données JSON
+        console.log(result);
         setData(result);  // Mettre à jour les données
         setLoading(false);  // Arrêter le chargement
       } catch (error) {
@@ -79,11 +80,10 @@ const DataTable = () => {
       <table {...getTableProps()} className="data-table">
         <thead>
           {headerGroups.map((headerGroup) => (
-            <tr  {...headerGroup.getHeaderGroupProps()}>
+            <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => (
-                <th {...column.getHeaderProps(column.getSortByToggleProps())}>
+                <th key={column.id} {...column.getHeaderProps(column.getSortByToggleProps())}>
                   {column.render('Header')}
-                  {/* Ajouter un indicateur de tri */}
                   <span>
                     {column.isSorted
                       ? column.isSortedDesc
@@ -91,26 +91,23 @@ const DataTable = () => {
                         : ' 🔼'
                       : ''}
                   </span>
-                  <div
-                    {...column.getResizerProps()}
-                    className="resizer"
-                  />
+                  <div {...column.getResizerProps()} className="resizer" />
                 </th>
               ))}
             </tr>
           ))}
         </thead>
         <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
-              <tr key={row.id} {...row.getRowProps()}>
-                {row.cells.map((cell) => {
-                  return <td key={cell.id} {...cell.getCellProps()}>{cell.render('Cell')}</td>;
-                })}
-              </tr>
-            );
-          })}
+        {rows.map((row) => {
+          prepareRow(row);
+          return (
+            <tr key={row.id} {...row.getRowProps()}>
+              {row.cells.map((cell) => {
+                return <td key={cell.id} {...cell.getCellProps()}>{cell.render('Cell')}</td>
+              })}
+            </tr>
+          );
+        })}
         </tbody>
       </table>
     </div>
