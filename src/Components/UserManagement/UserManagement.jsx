@@ -1,127 +1,78 @@
-// src/Components/UserManagement/UserManagement.jsx
-import React, { useEffect, useState } from 'react';
-import './UserManagement.css'; // Assurez-vous d'avoir les styles nécessaires
+import React, { useState, useEffect } from 'react';
+import { fetchUsers, createUser, updateUser } from '../../utils/userApi'; // Assurez-vous que ces fonctions sont importées correctement
+import './UserManagement.css';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null); // Pour gérer l'utilisateur sélectionné
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [newUser, setNewUser] = useState({ username: '', email: '', role: '', password: '', domain: '' });
+  const [selectedUser, setSelectedUser] = useState(null); // Pour la mise à jour des utilisateurs existants
 
-  // Récupérer les utilisateurs de l'API
   useEffect(() => {
-    fetchUsers();
+    fetchUsers().then(setUsers).catch(console.error);
   }, []);
 
-  const fetchUsers = async () => {
+  const handleCreateUser = async () => {
     try {
-      const response = await fetch('http://localhost:3000/api/users');
-      if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des utilisateurs');
-      }
-      const data = await response.json();
-      setUsers(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      const user = await createUser(newUser);
+      setUsers([...users, user]); // Ajouter le nouvel utilisateur à la liste
+      setNewUser({ username: '', email: '', role: '', password: '', domain: '' }); // Réinitialiser le formulaire
+    } catch (error) {
+      console.error('Erreur lors de la création de l\'utilisateur:', error);
     }
   };
 
-  // Fonction pour mettre à jour l'utilisateur
-  const updateUser = async (updatedUser) => {
+  const handleUpdateUser = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:3000/api/users/${updatedUser._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedUser),
-      });
-      if (!response.ok) {
-        throw new Error('Erreur lors de la mise à jour de l\'utilisateur');
-      }
-      fetchUsers(); // Mettre à jour la liste des utilisateurs
+      const updatedUser = await updateUser(userId, selectedUser);
+      setUsers(users.map(user => (user._id === userId ? updatedUser : user))); // Mettre à jour la liste des utilisateurs
       setSelectedUser(null); // Réinitialiser l'utilisateur sélectionné
-    } catch (err) {
-      setError(err.message);
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
     }
-  };
-
-  // Fonction pour gérer la sélection d'un utilisateur dans le tableau
-  const handleUserClick = (user) => {
-    setSelectedUser(user); // Sélectionner l'utilisateur
-  };
-
-  // Gestion de l'affichage de la page utilisateur avec les champs modifiables
-  const renderUserDetail = () => {
-    if (!selectedUser) return null;
-
-    return (
-      <div className="user-detail">
-        <h3>Modifier l'utilisateur</h3>
-        <input
-          type="text"
-          value={selectedUser.email}
-          onChange={(e) => setSelectedUser({ ...selectedUser, email: e.target.value })}
-        />
-        <input
-          type="text"
-          value={selectedUser.username}
-          onChange={(e) => setSelectedUser({ ...selectedUser, username: e.target.value })}
-        />
-        <select
-          value={selectedUser.role}
-          onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value })}
-        >
-          <option value="user">User</option>
-          <option value="client">Client</option>
-          <option value="admin">Admin</option>
-        </select>
-        <input
-          type="date"
-          value={new Date(selectedUser.license.endDate).toISOString().substring(0, 10)} // Affichage de la date pour modification
-          onChange={(e) =>
-            setSelectedUser({
-              ...selectedUser,
-              license: { ...selectedUser.license, endDate: e.target.value },
-            })
-          }
-        />
-        <button onClick={() => updateUser(selectedUser)}>Enregistrer les modifications</button>
-      </div>
-    );
   };
 
   return (
-    <div className="user-management-container">
-      <h2>Gestion des Utilisateurs</h2>
-      {error && <p className="error">{error}</p>}
-      {loading ? (
-        <p>Chargement des utilisateurs...</p>
-      ) : (
-        <table className="user-table">
-          <thead>
-            <tr>
-              <th>Email</th>
-              <th>Nom d'utilisateur</th>
-              <th>Rôle</th>
-              <th>Date de fin de validité de la licence</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user._id} onClick={() => handleUserClick(user)}>
-                <td>{user.email}</td>
-                <td>{user.username}</td>
-                <td>{user.role}</td>
-                <td>{new Date(user.license.endDate).toLocaleDateString()}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+    <div>
+      <h2>Gestion des utilisateurs</h2>
+
+      {/* Formulaire de création d'un nouvel utilisateur */}
+      <div className="user-form">
+        <input
+          type="text"
+          placeholder="Nom d'utilisateur"
+          value={newUser.username}
+          onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+        />
+        {/* Autres champs pour l'email, rôle, mot de passe, etc. */}
+        <button onClick={handleCreateUser}>Créer l'utilisateur</button>
+      </div>
+
+      {/* Liste des utilisateurs */}
+      <div className="user-list">
+        <h3>Liste des utilisateurs</h3>
+        {users.map(user => (
+          <div key={user._id}>
+            <p>{user.username} ({user.email})</p>
+            <button onClick={() => setSelectedUser(user)}>Modifier</button>
+            {/* Ajouter plus de logique pour la gestion de l'édition */}
+          </div>
+        ))}
+      </div>
+
+      {/* Affichage des détails de l'utilisateur sélectionné */}
+      {selectedUser && (
+        <div className="edit-user">
+          <h3>Modifier l'utilisateur</h3>
+          <input
+            type="text"
+            placeholder="Nom d'utilisateur"
+            value={selectedUser.username}
+            onChange={(e) => setSelectedUser({ ...selectedUser, username: e.target.value })}
+          />
+          {/* Autres champs pour l'édition */}
+          <button onClick={() => handleUpdateUser(selectedUser._id)}>Mettre à jour</button>
+        </div>
       )}
-      {renderUserDetail()}
     </div>
   );
 };

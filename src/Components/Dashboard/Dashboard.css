@@ -1,5 +1,7 @@
+#root{
+  width: 100%;
+}
 .dashboard {
-    display: flex;
     background-color: #f4f4f9; /* Couleur de fond plus claire */
   }
   

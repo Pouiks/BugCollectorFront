@@ -1,115 +1,71 @@
-import React, { useMemo, useEffect, useState } from 'react';
-import { useTable, useSortBy, useResizeColumns } from 'react-table';
-import './DataTable.css';
+// Components/DataTable/DataTable.jsx
+import React, { useEffect, useState } from 'react';
+import { fetchBugsForDomain, createBug } from '../../utils/bugApi';
 
 const DataTable = () => {
-  const [data, setData] = useState([]);  // État pour stocker les données récupérées
-  const [loading, setLoading] = useState(true);  // État pour gérer le chargement
+  const [bugs, setBugs] = useState([]);
+  const [newBug, setNewBug] = useState({ url: '', description: '', impact: '' });
+  const userDomain = localStorage.getItem('userDomain'); // Récupérer le domaine utilisateur du stockage local
 
-  // Fonction pour récupérer les données de l'API
   useEffect(() => {
-    const fetchBugs = async () => {
-      try {
-        const response = await fetch('http://localhost:3000/api/bugs');  // Remplace par ton URL d'API
-        const result = await response.json();  // Parse les données JSON
-        console.log(result);
-        setData(result);  // Mettre à jour les données
-        setLoading(false);  // Arrêter le chargement
-      } catch (error) {
-        console.error('Erreur lors de la récupération des bugs:', error);
-        setLoading(false);  // Arrêter le chargement en cas d'erreur
-      }
-    };
+    if (userDomain) {
+      fetchBugs(userDomain);  // Utiliser le domaine pour récupérer les bugs
+    } else {
+      console.error("Erreur : Domaine utilisateur introuvable.");
+    }
+  }, [userDomain]);
 
-    fetchBugs();  // Appeler la fonction pour récupérer les données
-  }, []);  // Le tableau vide [] signifie que cet effet ne se déclenche qu'au montage
+  const fetchBugs = async (domain) => {
+    try {
+      const fetchedBugs = await fetchBugsForDomain(domain);  // Passe le domaine
+      setBugs(fetchedBugs);
+    } catch (err) {
+      console.error('Erreur lors de la récupération des bugs:', err);
+    }
+  };
 
-  // Définir les colonnes avec useMemo pour optimiser les performances
-  const columns = useMemo(
-    () => [
-      {
-        Header: 'ID',
-        accessor: '_id',
-      },
-      {
-        Header: 'Domain',
-        accessor: 'domainName',
-      },
-      {
-        Header: 'URL du BUG',
-        accessor: 'bugs[0].url',
-        Cell: ({ value }) => (
-          <a href={value} target="_blank" rel="noopener noreferrer">
-            {value}
-          </a>
-        ),
-      },
-      {
-        Header: 'Descriptif',
-        accessor: 'bugs[0].description',
-      },
-      {
-        Header: 'Impact',
-        accessor: 'bugs[0].impact',
-      },
-      {
-        Header: 'Date',
-        accessor: 'bugs[0].date',
-        Cell: ({ value }) => new Date(value).toLocaleDateString() + ' ' + new Date(value).toLocaleTimeString(),
-      },
-    ],
-    []
-  );
-
-  // Utiliser les hooks de react-table pour définir le tableau avec les fonctionnalités de tri et de redimensionnement
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } = useTable(
-    {
-      columns,
-      data,
-    },
-    useSortBy,  // Permet de trier les colonnes
-    useResizeColumns // Permet de redimensionner les colonnes
-  );
-
-  if (loading) {
-    return <div>Chargement des données...</div>;  // Affiche un message de chargement
-  }
+  const handleCreateBug = async () => {
+    try {
+      await createBug(newBug);
+      fetchBugs(userDomain);
+    } catch (err) {
+      console.error('Erreur lors de la création du bug:', err);
+    }
+  };
 
   return (
-    <div className="table-container">
-      <table {...getTableProps()} className="data-table">
-        <thead>
-          {headerGroups.map((headerGroup) => (
-            <tr key={headerGroup.id} {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => (
-                <th key={column.id} {...column.getHeaderProps(column.getSortByToggleProps())}>
-                  {column.render('Header')}
-                  <span>
-                    {column.isSorted
-                      ? column.isSortedDesc
-                        ? ' 🔽'
-                        : ' 🔼'
-                      : ''}
-                  </span>
-                  <div {...column.getResizerProps()} className="resizer" />
-                </th>
+    <div className="data-table">
+      <h2>Table des Bugs</h2>
+      {userDomain ? (
+        <>
+          <table>
+            <thead>
+              <tr>
+                <th>URL</th>
+                <th>Description</th>
+                <th>Impact</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bugs.map((bug) => (
+                <tr key={bug._id}>
+                  <td>{bug.url}</td>
+                  <td>{bug.description}</td>
+                  <td>{bug.impact}</td>
+                </tr>
               ))}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-        {rows.map((row) => {
-          prepareRow(row);
-          return (
-            <tr key={row.id} {...row.getRowProps()}>
-              {row.cells.map((cell) => {
-                return <td key={cell.id} {...cell.getCellProps()}>{cell.render('Cell')}</td>
-              })}
-            </tr>
-          );
-        })}
-        </tbody>
-      </table>
+            </tbody>
+          </table>
+        </>
+      ) : (
+        <p>Erreur : Domaine utilisateur introuvable.</p>
+      )}
+
+      <h3>Ajouter un Bug</h3>
+      <input type="text" placeholder="URL" value={newBug.url} onChange={(e) => setNewBug({ ...newBug, url: e.target.value })} />
+      <input type="text" placeholder="Description" value={newBug.description} onChange={(e) => setNewBug({ ...newBug, description: e.target.value })} />
+      <input type="text" placeholder="Impact" value={newBug.impact} onChange={(e) => setNewBug({ ...newBug, impact: e.target.value })} />
+      <button onClick={handleCreateBug}>Ajouter Bug</button>
     </div>
   );
 };
