@@ -14,29 +14,43 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 800px;
+    margin: 0 auto;
+    width: 40%;
     height: 500px;
-    background-color: #e0e0d9;
+    background-color: #ffffff;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     border-radius: 10px;
     position: relative;
     overflow: hidden; /* Ensure child elements don't overflow */
   }
   
-  .Card_Container-first {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%); /* Center the container */
+  .login-form{
     width: 100%;
-    height: 100%;
+    height: 100% ;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
+    justify-content: space-around;
   }
+  input {
+    width: 100%;
+    margin: 10px 0 10px 0;
+    border-radius: 3px;
+  }
+
   
   .Card_Container-second {
     flex: 1;
     background: transparent;
     display: none; /* Currently empty */
   }
-  
+  .showPasswordContainer > input{
+    margin: 0 0 0 10px;
+  }
+
+  .loginFormSubmit{
+    background-color: green;
+    color: white;
+  }
+  .error-message{
+    color: red;
+  }

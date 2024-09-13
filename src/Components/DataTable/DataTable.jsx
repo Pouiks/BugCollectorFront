@@ -1,6 +1,7 @@
 // Components/DataTable/DataTable.jsx
 import React, { useEffect, useState } from 'react';
 import { fetchBugsForDomain, createBug } from '../../utils/bugApi';
+import './DataTable.css'
 
 const DataTable = () => {
   const [bugs, setBugs] = useState([]);
@@ -61,11 +62,10 @@ const DataTable = () => {
         <p>Erreur : Domaine utilisateur introuvable.</p>
       )}
 
-      <h3>Ajouter un Bug</h3>
-      <input type="text" placeholder="URL" value={newBug.url} onChange={(e) => setNewBug({ ...newBug, url: e.target.value })} />
+      {/* <input type="text" placeholder="URL" value={newBug.url} onChange={(e) => setNewBug({ ...newBug, url: e.target.value })} />
       <input type="text" placeholder="Description" value={newBug.description} onChange={(e) => setNewBug({ ...newBug, description: e.target.value })} />
       <input type="text" placeholder="Impact" value={newBug.impact} onChange={(e) => setNewBug({ ...newBug, impact: e.target.value })} />
-      <button onClick={handleCreateBug}>Ajouter Bug</button>
+      <button onClick={handleCreateBug}>Ajouter Bug</button> */}
     </div>
   );
 };

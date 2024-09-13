@@ -13,7 +13,7 @@
     border-collapse: collapse; /* Fusion des bordures pour un style propre */
     background-color: #fff;
     color: #333;
-    border: 1px solid #ddd;
+    /* border: 1px solid #000; */
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Ombre douce */
   }
@@ -22,12 +22,18 @@
     padding: 12px;
     text-align: left;
     border-bottom: 1px solid #ddd;
+    border: 1px solid #000;
     position: relative; /* Nécessaire pour le resizer */
+  }
+  td{
+    border: 1px solid #000;
+
   }
   
   th {
     cursor: pointer;
     background-color: #f0f0f5;
+    border: 1px solid #000;
     user-select: none; /* Désactiver la sélection du texte lors du redimensionnement */
   }
   

@@ -20,8 +20,8 @@ const Sidebar = ({ onLogout }) => {
       <Nav className="flex-column sidebar-nav">
         <Nav.Link href="#home">Home</Nav.Link>
         <Nav.Link href="#dashboard">Dashboard</Nav.Link>
-        <Nav.Link href="#reports">Reports</Nav.Link>
-        <Nav.Link href="#settings">Settings</Nav.Link>
+        <Nav.Link href="#Users">Utilisateurs</Nav.Link>
+        <Nav.Link href="#profil">Profil</Nav.Link>
       </Nav>
       <Button variant="danger" onClick={onLogout} className="logout-button">
         Logout
