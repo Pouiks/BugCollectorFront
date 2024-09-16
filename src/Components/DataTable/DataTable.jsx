@@ -48,8 +48,8 @@ const DataTable = () => {
               </tr>
             </thead>
             <tbody>
-              {bugs.map((bug) => (
-                <tr key={bug._id}>
+              {bugs.map((bug, index) => (
+                <tr key={bug._id || index}> {/* Utiliser `index` comme clé de secours */}
                   <td>{bug.url}</td>
                   <td>{bug.description}</td>
                   <td>{bug.impact}</td>

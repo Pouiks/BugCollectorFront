@@ -1,69 +1,99 @@
 // src/App.jsx
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginLayout from './Components/Login/Login';
 import Dashboard from './Components/Dashboard/Dashboard';
-import UserManagement from './Components/UserManagement/UserManagement';  // Composant de gestion des utilisateurs
-import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute';  // Import du composant de route protégée
+import UserManagement from './Components/UserManagement/UserManagement';
+import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute';
+import { UserContextProvider, useUser } from './context/UserContext';
+import { fetchUserProfile, handleLogout } from './utils/authApi';
 
 const App = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState('');
-  const [userRole, setUserRole] = useState('');  // Nouvel état pour le rôle de l'utilisateur
+  return (
+    <UserContextProvider>
+      <Router>
+        <AppRoutes />
+      </Router>
+    </UserContextProvider>
+  );
+};
 
-  const handleLogin = (user) => {
-    setIsAuthenticated(true);
-    setUsername(user.username);
-    setUserRole(user.role);  // Définir le rôle de l'utilisateur après la connexion
+const AppRoutes = () => {
+  const { user, loginUser, logoutUser } = useUser();
+  const [loading, setLoading] = useState(true); // État de chargement initial
+  const [initialized, setInitialized] = useState(false); // Nouvel état pour suivre l'initialisation
+
+  useEffect(() => {
+    const checkUserLoggedIn = async () => {
+      try {
+        setLoading(true);
+        const userData = await fetchUserProfile(); // Récupérer les informations de l'utilisateur
+        if (userData && userData.username) {
+          loginUser({ user: userData }); // Charger les données utilisateur dans le contexte
+        }
+      } catch (error) {
+        console.error('Erreur lors de la vérification de l\'utilisateur connecté :', error);
+        // Ne pas déconnecter immédiatement pour éviter la boucle
+      } finally {
+        setLoading(false);
+        setInitialized(true); // Initialisation terminée
+      }
+    };
+
+    if (!initialized) { // N'exécuter qu'une seule fois après le montage
+      checkUserLoggedIn();
+    }
+  }, [loginUser, initialized]); // Dépendances mises à jour
+
+  const handleLogoutClick = async () => {
+    try {
+      await handleLogout();
+      logoutUser();
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion :', error);
+    }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setUsername('');
-    setUserRole('');
-  };
+  if (loading) {
+    return <p>Chargement...</p>;
+  }
 
   return (
-    <Router>
-      <Routes>
-        {/* Route de connexion */}
-        <Route
-          path="/"
-          element={
-            isAuthenticated ? (
-              <Navigate to="/dashboard" replace />
-            ) : (
-              <LoginLayout onLogin={handleLogin} />
-            )
-          }
-        />
+    <Routes>
+      <Route
+        path="/"
+        element={
+          user ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <LoginLayout onLogin={loginUser} />
+          )
+        }
+      />
 
-        {/* Route du tableau de bord */}
-        <Route
-          path="/dashboard"
-          element={
-            isAuthenticated ? (
-              <Dashboard username={username} onLogout={handleLogout} />
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
+      <Route
+        path="/dashboard"
+        element={
+          user ? (
+            <Dashboard onLogout={handleLogoutClick} />
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
 
-        {/* Route protégée pour la gestion des utilisateurs */}
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute 
-              element={UserManagement}  // Le composant à afficher
-              isAuthenticated={isAuthenticated}  // Vérifie l'authentification
-              userRole={userRole}  // Rôle de l'utilisateur
-              allowedRoles={['admin']}  // Seuls les 'admin' peuvent accéder
-            />
-          }
-        />
-      </Routes>
-    </Router>
+      <Route
+        path="/users"
+        element={
+          <ProtectedRoute
+            element={UserManagement}
+            isAuthenticated={!!user}
+            userRole={user?.role}
+            allowedRoles={['admin']}
+          />
+        }
+      />
+    </Routes>
   );
 };
 
