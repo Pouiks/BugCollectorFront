@@ -1,84 +1,60 @@
-#root{
-  min-width: 100%;
+/* DataTable.css */
+
+.data-table {
+  width: 100%;
+  overflow-x: auto; /* Permettre le défilement horizontal uniquement si nécessaire */
+  margin: 0 auto; /* Centrer le tableau */
+  padding: 20px;
+  max-width: 100%;
 }
 
-.table-container {
-    width: 100%;
-    overflow-x: auto; /* Permet le défilement horizontal */
-    margin-top: 20px;
-  }
-  
-  .data-table {
-    width: 100%;
-    border-collapse: collapse; /* Fusion des bordures pour un style propre */
-    background-color: #fff;
-    color: #333;
-    /* border: 1px solid #000; */
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Ombre douce */
-  }
-  
-  th, td {
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #ddd;
-    border: 1px solid #000;
-    position: relative; /* Nécessaire pour le resizer */
-  }
-  td{
-    border: 1px solid #000;
+.data-table table {
+  width: 100%;
+  border-collapse: collapse; /* Supprimer les espaces entre les cellules */
+  table-layout: fixed; /* Assurer une largeur de colonne fixe */
+}
 
+.data-table th, .data-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd; /* Ligne en bas pour séparer les lignes */
+  word-wrap: break-word; /* Permettre le passage à la ligne pour les longues phrases */
+  white-space: normal; /* Permettre le retour à la ligne */
+  overflow: hidden; /* Cacher le débordement */
+  text-overflow: ellipsis; /* Ajouter des points de suspension si le texte est trop long */
+}
+
+.data-table th {
+  background-color: #f2f2f2; /* Couleur de fond des en-têtes */
+  position: sticky;
+  top: 0; /* Garder l'en-tête collée en haut lors du défilement */
+  z-index: 1;
+}
+
+.data-table tr:hover {
+  background-color: #f5f5f5; /* Changer la couleur de fond lors du survol */
+}
+
+/* Limiter la largeur des colonnes */
+.data-table th:first-child, .data-table td:first-child {
+  width: 30%; /* Largeur de la première colonne (URL) */
+}
+
+.data-table th:nth-child(2), .data-table td:nth-child(2) {
+  width: 50%; /* Largeur de la deuxième colonne (Description) */
+}
+
+.data-table th:nth-child(3), .data-table td:nth-child(3) {
+  width: 20%; /* Largeur de la troisième colonne (Impact) */
+}
+
+/* Rendre le tableau responsive sur les petits écrans */
+@media (max-width: 768px) {
+  .data-table table {
+    width: 100%;
   }
-  
-  th {
-    cursor: pointer;
-    background-color: #f0f0f5;
-    border: 1px solid #000;
-    user-select: none; /* Désactiver la sélection du texte lors du redimensionnement */
+
+  .data-table th, .data-table td {
+    padding: 8px;
   }
-  
-  th .resizer {
-    display: inline-block;
-    width: 10px;
-    height: 100%;
-    position: absolute;
-    right: 0;
-    top: 0;
-    transform: translateX(50%);
-    z-index: 1;
-    touch-action: none; /* Empêcher l'action par défaut sur les appareils tactiles */
-  }
-  
-  th .resizer:hover,
-  th .resizer:active {
-    background-color: #ddd;
-    cursor: col-resize; /* Pointeur de redimensionnement */
-  }
-  
-  th.sorted-ascending:after {
-    content: '\\2191'; /* Flèche vers le haut */
-    margin-left: 8px;
-  }
-  
-  th.sorted-descending:after {
-    content: '\\2193'; /* Flèche vers le bas */
-    margin-left: 8px;
-  }
-  
-  tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  tr:hover {
-    background-color: #e2e6ea;
-  }
-  
-  a {
-    color: #007bff;
-    text-decoration: none;
-  }
-  
-  a:hover {
-    color: #0056b3;
-  }
-  
+}
