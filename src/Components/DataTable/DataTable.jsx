@@ -7,6 +7,7 @@ import { useUser } from '../../context/UserContext';
 const DataTable = () => {
   const [bugs, setBugs] = useState([]); // État pour stocker les bugs récupérés
   const [searchTerm, setSearchTerm] = useState(''); // État pour stocker le terme de recherche
+  const [sortOrder, setSortOrder] = useState('desc'); // État pour l'ordre de tri (asc ou desc)
   const { user } = useUser(); // Obtenir l'utilisateur connecté depuis le contexte
 
   useEffect(() => {
@@ -51,6 +52,18 @@ const DataTable = () => {
     setSearchTerm(e.target.value.toLowerCase()); // Mettre à jour le terme de recherche en minuscules pour une recherche insensible à la casse
   };
 
+  const handleSortByDate = () => {
+    const sortedBugs = [...bugs].sort((a, b) => {
+      if (sortOrder === 'asc') {
+        return new Date(a.date) - new Date(b.date);
+      } else {
+        return new Date(b.date) - new Date(a.date);
+      }
+    });
+    setBugs(sortedBugs); // Mettre à jour les bugs triés
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); // Inverser l'ordre de tri
+  };
+
   // Filtrer les bugs en fonction du terme de recherche et de la partie du domaine, y compris les sous-domaines
   const filteredBugs = bugs.filter((bug) => {
     const domain = new URL(bug.url).hostname.toLowerCase(); // Extraire le domaine complet (inclut sous-domaines)
@@ -68,7 +81,7 @@ const DataTable = () => {
           placeholder="Rechercher par domaine ou sous-domaine..."
           value={searchTerm}
           onChange={handleSearchChange}
-          style={{ marginBottom: '20px', padding: '10px', width: '90%' }}
+          style={{ marginBottom: '20px', padding: '10px', width: '100%' }}
         />
       )}
 
@@ -79,6 +92,9 @@ const DataTable = () => {
               <th>URL</th>
               <th>Description</th>
               <th>Impact</th>
+              <th onClick={handleSortByDate} style={{ cursor: 'pointer' }}>
+                Date {sortOrder === 'asc' ? '↑' : '↓'}
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -87,6 +103,7 @@ const DataTable = () => {
                 <td>{bug.url}</td>
                 <td>{bug.description}</td>
                 <td>{bug.impact}</td>
+                <td>{bug.date.substring(0, 10)}</td> {/* Afficher seulement les 10 premiers caractères de la date */}
               </tr>
             ))}
           </tbody>

@@ -36,7 +36,7 @@
 
 /* Limiter la largeur des colonnes */
 .data-table th:first-child, .data-table td:first-child {
-  width: 30%; /* Largeur de la première colonne (URL) */
+  width: 20%; /* Largeur de la première colonne (URL) */
 }
 
 .data-table th:nth-child(2), .data-table td:nth-child(2) {
@@ -44,7 +44,7 @@
 }
 
 .data-table th:nth-child(3), .data-table td:nth-child(3) {
-  width: 20%; /* Largeur de la troisième colonne (Impact) */
+  width: 15%; /* Largeur de la troisième colonne (Impact) */
 }
 
 /* Rendre le tableau responsive sur les petits écrans */
