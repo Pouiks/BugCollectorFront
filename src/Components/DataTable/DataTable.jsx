@@ -68,7 +68,7 @@ const DataTable = () => {
           placeholder="Rechercher par domaine ou sous-domaine..."
           value={searchTerm}
           onChange={handleSearchChange}
-          style={{ marginBottom: '20px', padding: '10px', width: '100%' }}
+          style={{ marginBottom: '20px', padding: '10px', width: '90%' }}
         />
       )}
 

@@ -4,7 +4,6 @@
   width: 100%;
   overflow-x: auto; /* Permettre le défilement horizontal uniquement si nécessaire */
   margin: 0 auto; /* Centrer le tableau */
-  padding: 20px;
   max-width: 100%;
 }
 
