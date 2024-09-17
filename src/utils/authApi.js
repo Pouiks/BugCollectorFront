@@ -45,21 +45,22 @@ export const fetchUserProfile = async () => {
   }
 };
 
-// Fonction pour se déconnecter
+// Fonction pour la déconnexion
 export const handleLogout = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/auth/logout', {
+    const response = await fetch(`http://localhost:3000/api/auth/logout`, {
       method: 'POST',
-      credentials: 'include', // Inclure les cookies pour la requête de déconnexion
+      credentials: 'include', // Assurez-vous que le cookie est inclus
     });
 
     if (!response.ok) {
       throw new Error('Erreur lors de la déconnexion');
     }
-
-    return true; // Déconnexion réussie
+    
+    return response.json();
   } catch (error) {
     console.error('Erreur lors de la déconnexion:', error);
     throw error;
   }
 };
+

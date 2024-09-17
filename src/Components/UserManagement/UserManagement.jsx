@@ -1,29 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { fetchUsers, createUser, updateUser } from '../../utils/userApi'; // Assurez-vous que ces fonctions sont importées correctement
+import { useUser } from '../../context/UserContext';
+
 import './UserManagement.css';
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [newUser, setNewUser] = useState({ username: '', email: '', role: '', password: '', domain: '' });
-  const [selectedUser, setSelectedUser] = useState(null); // Pour la mise à jour des utilisateurs existants
+  const [users, setUsers] = useState([]); // État pour stocker les utilisateurs
+  const [newUser, setNewUser] = useState({ firstName: '', lastName: '', username: '', email: '', domain: '' }); // État pour le nouvel utilisateur
+  const [selectedUser, setSelectedUser] = useState(null); // État pour l'utilisateur sélectionné
+  const { user } = useUser();
 
+  // Fonction pour récupérer les utilisateurs à partir de l'API
   useEffect(() => {
-    fetchUsers().then(setUsers).catch(console.error);
+    {
+      user.user.role === "admin" ?
+      fetchUsers().then(setUsers).catch(console.error) : null;
+    }
   }, []);
 
+  // Fonction pour créer un nouvel utilisateur
   const handleCreateUser = async () => {
     try {
-      const user = await createUser(newUser);
+      console.log(newUser)
+      const user = await createUser(newUser); // Créer un nouvel utilisateur via l'API
       setUsers([...users, user]); // Ajouter le nouvel utilisateur à la liste
-      setNewUser({ username: '', email: '', role: '', password: '', domain: '' }); // Réinitialiser le formulaire
+      setNewUser({ firstName: '', lastName: '', username: '', email: '', domain: '' }); // Réinitialiser le formulaire
     } catch (error) {
       console.error('Erreur lors de la création de l\'utilisateur:', error);
     }
   };
 
+  // Fonction pour mettre à jour un utilisateur existant
   const handleUpdateUser = async (userId) => {
     try {
-      const updatedUser = await updateUser(userId, selectedUser);
+      const updatedUser = await updateUser(userId, selectedUser); // Mettre à jour l'utilisateur via l'API
       setUsers(users.map(user => (user._id === userId ? updatedUser : user))); // Mettre à jour la liste des utilisateurs
       setSelectedUser(null); // Réinitialiser l'utilisateur sélectionné
     } catch (error) {
@@ -39,11 +49,39 @@ const UserManagement = () => {
       <div className="user-form">
         <input
           type="text"
-          placeholder="Nom d'utilisateur"
+          placeholder="Prénom"
+          value={newUser.firstName}
+          onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Nom"
+          value={newUser.lastName}
+          onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Surnom"
           value={newUser.username}
           onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+          required
         />
-        {/* Autres champs pour l'email, rôle, mot de passe, etc. */}
+        <input
+          type="email"
+          placeholder="Adresse e-mail"
+          value={newUser.email}
+          onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Domaine"
+          value={newUser.domain}
+          onChange={(e) => setNewUser({ ...newUser, domain: e.target.value })}
+          required
+        />
         <button onClick={handleCreateUser}>Créer l'utilisateur</button>
       </div>
 
@@ -52,7 +90,7 @@ const UserManagement = () => {
         <h3>Liste des utilisateurs</h3>
         {users.map(user => (
           <div key={user._id}>
-            <p>{user.username} ({user.email})</p>
+            <p>{user.firstName} {user.lastName} ({user.username} - {user.email})</p>
             <button onClick={() => setSelectedUser(user)}>Modifier</button>
             {/* Ajouter plus de logique pour la gestion de l'édition */}
           </div>

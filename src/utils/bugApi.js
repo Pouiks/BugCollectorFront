@@ -15,7 +15,6 @@ export const fetchAllBugs = async () => {
     }
 
     const data = await response.json();
-    console.log("Bugs récupérés côté front:", data); // Ajoute ce log pour voir les données récupérées
     return data; // Retourner tous les bugs
   } catch (error) {
     console.error('Erreur lors de la récupération de tous les bugs:', error);

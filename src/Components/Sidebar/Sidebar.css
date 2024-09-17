@@ -29,7 +29,10 @@
     font-size: 1.2rem;
     color: #333; /* Couleur plus sombre */
   }
-  
+  .sidebar-nav {
+    display:flex;
+    flex-direction: column;
+  }
   .sidebar-nav a {
     padding: 10px;
     display: flex;

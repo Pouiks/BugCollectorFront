@@ -12,13 +12,11 @@ const DataTable = () => {
 
   useEffect(() => {
     if (user && user.user) { // Vérifie que `user` et `user.user` existent
-      console.log("Utilisateur connecté:", user.user);  // Log de l'utilisateur connecté
 
       if (user.user.role === 'admin') { // Corrige l'accès au rôle d'utilisateur
         // Si l'utilisateur est admin, récupérer tous les bugs
         fetchAllBugs()
           .then((data) => {
-            console.log("Bugs récupérés pour admin:", data);  // Log des bugs récupérés pour admin
             setBugs(data);
           })
           .catch((err) => console.error('Erreur lors de la récupération de tous les bugs:', err));
@@ -103,7 +101,7 @@ const DataTable = () => {
                 <td>{bug.url}</td>
                 <td>{bug.description}</td>
                 <td>{bug.impact}</td>
-                <td>{bug.date.substring(0, 10)}</td> {/* Afficher seulement les 10 premiers caractères de la date */}
+                <td>{bug.date.substring(0, 10)}</td> 
               </tr>
             ))}
           </tbody>

@@ -3,8 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginLayout from './Components/Login/Login';
 import Dashboard from './Components/Dashboard/Dashboard';
-import UserManagement from './Components/UserManagement/UserManagement';
-import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute';
 import { UserContextProvider, useUser } from './context/UserContext';
 import { fetchUserProfile, handleLogout } from './utils/authApi';
 
@@ -20,30 +18,29 @@ const App = () => {
 
 const AppRoutes = () => {
   const { user, loginUser, logoutUser } = useUser();
-  const [loading, setLoading] = useState(true); // État de chargement initial
-  const [initialized, setInitialized] = useState(false); // Nouvel état pour suivre l'initialisation
+  const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     const checkUserLoggedIn = async () => {
       try {
         setLoading(true);
-        const userData = await fetchUserProfile(); // Récupérer les informations de l'utilisateur
+        const userData = await fetchUserProfile();
         if (userData && userData.username) {
-          loginUser({ user: userData }); // Charger les données utilisateur dans le contexte
+          loginUser({ user: userData });
         }
       } catch (error) {
         console.error('Erreur lors de la vérification de l\'utilisateur connecté :', error);
-        // Ne pas déconnecter immédiatement pour éviter la boucle
       } finally {
         setLoading(false);
-        setInitialized(true); // Initialisation terminée
+        setInitialized(true);
       }
     };
 
-    if (!initialized) { // N'exécuter qu'une seule fois après le montage
+    if (!initialized) {
       checkUserLoggedIn();
     }
-  }, [loginUser, initialized]); // Dépendances mises à jour
+  }, [loginUser, initialized]);
 
   const handleLogoutClick = async () => {
     try {
@@ -70,27 +67,15 @@ const AppRoutes = () => {
           )
         }
       />
-
+      {/* Route pour le dashboard, toujours accessible si connecté */}
       <Route
-        path="/dashboard"
+        path="/dashboard/*"
         element={
           user ? (
             <Dashboard onLogout={handleLogoutClick} />
           ) : (
             <Navigate to="/" replace />
           )
-        }
-      />
-
-      <Route
-        path="/users"
-        element={
-          <ProtectedRoute
-            element={UserManagement}
-            isAuthenticated={!!user}
-            userRole={user?.role}
-            allowedRoles={['admin']}
-          />
         }
       />
     </Routes>

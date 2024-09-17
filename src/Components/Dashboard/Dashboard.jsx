@@ -2,26 +2,33 @@
 import React from 'react';
 import Sidebar from '../Sidebar/Sidebar.jsx';
 import DataTable from '../DataTable/DataTable.jsx';
-import { useUser } from '../../context/UserContext'; // Importer le hook pour accéder au contexte utilisateur
+import UserManagement from '../UserManagement/UserManagement.jsx';
+import { useUser } from '../../context/UserContext';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import './Dashboard.css';
 
 const Dashboard = ({ onLogout }) => {
-  const { user } = useUser(); // Utiliser le hook pour obtenir les données de l'utilisateur
+  const { user } = useUser();
 
   if (!user || !user.user) {
-    // Vérifier que user et user.user sont définis
-    return <p>Chargement...</p>; // Afficher un état de chargement approprié
+    return <p>Chargement...</p>;
   }
 
-  const finalUser = user.user; // Extraire les données utilisateur du contexte
-  console.log("Utilisateur final:", finalUser);
+  const finalUser = user.user;
 
   return (
     <div className="dashboard">
+      {/* Sidebar toujours affichée */}
       <Sidebar onLogout={onLogout} />
       <div className="content">
-        <h2>Welcome, {finalUser.username}!</h2> {/* Utilisation de finalUser */}
-        <DataTable />
+        <h2>Welcome, {finalUser.username}!</h2>
+
+        {/* Routes internes pour naviguer entre DataTable et UserManagement */}
+        <Routes>
+          <Route path="/" element={<Navigate to="datatable" />} />
+          <Route path="datatable" element={<DataTable />} />
+          <Route path="users" element={<UserManagement />} />
+        </Routes>
       </div>
     </div>
   );

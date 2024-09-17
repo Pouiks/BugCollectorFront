@@ -3,12 +3,13 @@ const API_BASE_URL = 'http://localhost:3000/api/users';
 // Fonction pour récupérer tous les utilisateurs
 export const fetchUsers = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}`, {
+    console.log("try fetch users")
+    const response = await fetch(`${API_BASE_URL}/all`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`, // Inclure le token JWT pour l'authentification
       },
+      credentials: 'include', // Assurez-vous que les cookies sont envoyés avec la requête
     });
 
     if (!response.ok) {
@@ -30,8 +31,8 @@ export const createUser = async (userData) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'include', // Assurez-vous que les cookies sont envoyés avec la requête
       body: JSON.stringify(userData),
     });
 
@@ -54,8 +55,8 @@ export const updateUser = async (userId, userData) => {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'include', // Assurez-vous que les cookies sont envoyés avec la requête
       body: JSON.stringify(userData),
     });
 
