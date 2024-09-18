@@ -1,29 +1,29 @@
+// src/Components/UserManagement/UserManagement.jsx
 import React, { useState, useEffect } from 'react';
-import { fetchUsers, createUser, updateUser } from '../../utils/userApi'; // Assurez-vous que ces fonctions sont importées correctement
+import { fetchUsers, createUser, updateUser } from '../../utils/userApi';
 import { useUser } from '../../context/UserContext';
-
 import './UserManagement.css';
 
 const UserManagement = () => {
-  const [users, setUsers] = useState([]); // État pour stocker les utilisateurs
-  const [newUser, setNewUser] = useState({ firstName: '', lastName: '', username: '', email: '', domain: '' }); // État pour le nouvel utilisateur
-  const [selectedUser, setSelectedUser] = useState(null); // État pour l'utilisateur sélectionné
+  const [users, setUsers] = useState([]);
+  const [newUser, setNewUser] = useState({ firstName: '', lastName: '', username: '', email: '', domain: '' });
+  const [selectedUser, setSelectedUser] = useState(null);
   const { user } = useUser();
 
   // Fonction pour récupérer les utilisateurs à partir de l'API
   useEffect(() => {
-    {
-      user.user.role === "admin" ?
-      fetchUsers().then(setUsers).catch(console.error) : null;
+    if (user.user.role === "admin") {
+      fetchUsers()
+        .then(setUsers)
+        .catch(console.error);
     }
-  }, []);
+  }, [user]);
 
   // Fonction pour créer un nouvel utilisateur
   const handleCreateUser = async () => {
     try {
-      console.log(newUser)
-      const user = await createUser(newUser); // Créer un nouvel utilisateur via l'API
-      setUsers([...users, user]); // Ajouter le nouvel utilisateur à la liste
+      const createdUser = await createUser(newUser);
+      setUsers([...users, createdUser]); // Ajouter le nouvel utilisateur à la liste
       setNewUser({ firstName: '', lastName: '', username: '', email: '', domain: '' }); // Réinitialiser le formulaire
     } catch (error) {
       console.error('Erreur lors de la création de l\'utilisateur:', error);
@@ -33,13 +33,22 @@ const UserManagement = () => {
   // Fonction pour mettre à jour un utilisateur existant
   const handleUpdateUser = async (userId) => {
     try {
-      const updatedUser = await updateUser(userId, selectedUser); // Mettre à jour l'utilisateur via l'API
+      const updatedUser = await updateUser(userId, selectedUser);
       setUsers(users.map(user => (user._id === userId ? updatedUser : user))); // Mettre à jour la liste des utilisateurs
-      setSelectedUser(null); // Réinitialiser l'utilisateur sélectionné
+      setSelectedUser(null);
     } catch (error) {
       console.error('Erreur lors de la mise à jour de l\'utilisateur:', error);
     }
   };
+
+  // Fonction de recherche d'utilisateur
+  const [searchTerm, setSearchTerm] = useState('');
+  const handleSearchChange = (e) => setSearchTerm(e.target.value.toLowerCase());
+
+  // Filtrer les utilisateurs
+  const filteredUsers = users.filter((user) =>
+    (`${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm) || user.email.toLowerCase().includes(searchTerm))
+  );
 
   return (
     <div>
@@ -85,31 +94,39 @@ const UserManagement = () => {
         <button onClick={handleCreateUser}>Créer l'utilisateur</button>
       </div>
 
-      {/* Liste des utilisateurs */}
-      <div className="user-list">
-        <h3>Liste des utilisateurs</h3>
-        {users.map(user => (
-          <div key={user._id}>
-            <p>{user.firstName} {user.lastName} ({user.username} - {user.email})</p>
-            <button onClick={() => setSelectedUser(user)}>Modifier</button>
-            {/* Ajouter plus de logique pour la gestion de l'édition */}
-          </div>
-        ))}
-      </div>
+      {/* Recherche */}
+      <input
+        type="text"
+        placeholder="Rechercher par nom ou email..."
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{ marginBottom: '20px', padding: '10px', width: '100%' }}
+      />
 
-      {/* Affichage des détails de l'utilisateur sélectionné */}
-      {selectedUser && (
-        <div className="edit-user">
-          <h3>Modifier l'utilisateur</h3>
-          <input
-            type="text"
-            placeholder="Nom d'utilisateur"
-            value={selectedUser.username}
-            onChange={(e) => setSelectedUser({ ...selectedUser, username: e.target.value })}
-          />
-          {/* Autres champs pour l'édition */}
-          <button onClick={() => handleUpdateUser(selectedUser._id)}>Mettre à jour</button>
-        </div>
+      {/* Tableau des utilisateurs */}
+      {filteredUsers.length > 0 ? (
+        <table className="user-table">
+          <thead>
+            <tr>
+              <th>Nom complet</th>
+              <th>Email</th>
+              <th>Domaine</th>
+              <th>Date de création</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredUsers.map((user, index) => (
+              <tr key={user._id || index}>
+                <td>{`${user.firstName} ${user.lastName}`}</td>
+                <td>{user.email}</td>
+                <td>{user.domain}</td>
+                <td>{user.createdAt ? user.createdAt.substring(0, 10) : ''}</td> {/* Date de création */}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p>Aucun utilisateur trouvé.</p>
       )}
     </div>
   );

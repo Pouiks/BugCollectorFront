@@ -27,7 +27,7 @@ export const fetchUsers = async () => {
 // Fonction pour créer un nouvel utilisateur
 export const createUser = async (userData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}`, {
+    const response = await fetch(`${API_BASE_URL}/create`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
