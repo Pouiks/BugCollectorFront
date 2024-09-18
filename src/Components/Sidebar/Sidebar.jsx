@@ -26,11 +26,11 @@ const Sidebar = ({ onLogout }) => {
           Dashboard
         </NavLink>
         {user.user.role === "admin" && (
-          <>
+          
             <NavLink to="/dashboard/users" className="nav-link"> {/* Lien correct vers UserManagement */}
               Utilisateurs
             </NavLink>
-          </>
+          
         )}
       </Nav>
       <Button variant="danger" onClick={onLogout} className="logout-button">

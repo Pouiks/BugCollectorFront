@@ -1,0 +1,60 @@
+/* DataTable.css */
+
+.data-table {
+    width: 100%;
+    overflow-x: auto; /* Permettre le défilement horizontal uniquement si nécessaire */
+    margin: 0 auto; /* Centrer le tableau */
+    max-width: 100%;
+  }
+  
+  .data-table table {
+    width: 100%;
+    border-collapse: collapse; /* Supprimer les espaces entre les cellules */
+    table-layout: fixed; /* Assurer une largeur de colonne fixe */
+  }
+  
+  .data-table th, .data-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd; /* Ligne en bas pour séparer les lignes */
+    word-wrap: break-word; /* Permettre le passage à la ligne pour les longues phrases */
+    white-space: normal; /* Permettre le retour à la ligne */
+    overflow: hidden; /* Cacher le débordement */
+    text-overflow: ellipsis; /* Ajouter des points de suspension si le texte est trop long */
+  }
+  
+  .data-table th {
+    background-color: #f2f2f2; /* Couleur de fond des en-têtes */
+    position: sticky;
+    top: 0; /* Garder l'en-tête collée en haut lors du défilement */
+    z-index: 1;
+  }
+  
+  .data-table tr:hover {
+    background-color: #f5f5f5; /* Changer la couleur de fond lors du survol */
+  }
+  
+  /* Limiter la largeur des colonnes */
+  .data-table th:first-child, .data-table td:first-child {
+    width: 20%; /* Largeur de la première colonne (URL ou nom complet) */
+  }
+  
+  .data-table th:nth-child(2), .data-table td:nth-child(2) {
+    width: 50%; /* Largeur de la deuxième colonne (Description ou email) */
+  }
+  
+  .data-table th:nth-child(3), .data-table td:nth-child(3) {
+    width: 15%; /* Largeur de la troisième colonne (Impact ou domaine) */
+  }
+  
+  /* Rendre le tableau responsive sur les petits écrans */
+  @media (max-width: 768px) {
+    .data-table table {
+      width: 100%;
+    }
+  
+    .data-table th, .data-table td {
+      padding: 8px;
+    }
+  }
+  
