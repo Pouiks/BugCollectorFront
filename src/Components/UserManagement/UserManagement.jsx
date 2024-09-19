@@ -33,7 +33,14 @@ const UserManagement = () => {
       setUsers([...users, createdUser]); // Ajouter le nouvel utilisateur à la liste
       setNewUser({ firstName: '', lastName: '', username: '', email: '', domain: '' }); // Réinitialiser le formulaire
     } catch (error) {
-      console.error('Erreur lors de la création de l\'utilisateur:', error);
+      if (error.response && error.response.status === 409) {
+        // Gérer le cas où l'email existe déjà
+        console.error("Erreur: L'email existe déjà.");
+        alert("Un utilisateur avec cet email existe déjà.");
+      } else {
+        // Gérer d'autres erreurs
+        console.error('Erreur lors de la création de l\'utilisateur:', error);
+      }
     }
   };
 

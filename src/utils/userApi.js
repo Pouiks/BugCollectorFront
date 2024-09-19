@@ -46,16 +46,16 @@ export const createUser = async (userData) => {
     });
 
     if (!response.ok) {
-      throw new Error('Erreur lors de la création de l\'utilisateur');
+      const errorData = await response.json(); // Extraire les détails de l'erreur
+      throw { response, data: errorData };
     }
 
-    const data = await response.json();
-    return data;
+    return await response.json();
   } catch (error) {
-    console.error('Erreur lors de la création de l\'utilisateur:', error);
     throw error;
   }
 };
+
 
 // Fonction pour mettre à jour un utilisateur
 export const updateUser = async (userId, userData) => {
