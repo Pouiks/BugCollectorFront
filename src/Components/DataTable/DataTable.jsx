@@ -1,53 +1,42 @@
-// Components/DataTable/DataTable.jsx
 import React, { useEffect, useState } from 'react';
 import { fetchBugsForDomain, fetchAllBugs } from '../../utils/bugApi';
 import './DataTable.css';
 import { useUser } from '../../context/UserContext';
+import ScreenModal from '../ScreenModal/ScreenModal';
 
 const DataTable = () => {
-  const [bugs, setBugs] = useState([]); // État pour stocker les bugs récupérés
-  const [searchTerm, setSearchTerm] = useState(''); // État pour stocker le terme de recherche
-  const [sortOrder, setSortOrder] = useState('desc'); // État pour l'ordre de tri (asc ou desc)
-  const { user } = useUser(); // Obtenir l'utilisateur connecté depuis le contexte
+  const [bugs, setBugs] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState('desc');
+  const [showModal, setShowModal] = useState(false);
+  const [selectedScreenshotUrl, setSelectedScreenshotUrl] = useState(null);
+  const { user } = useUser();
 
   useEffect(() => {
-    if (user && user.user) { // Vérifie que `user` et `user.user` existent
-
-      if (user.user.role === 'admin') { // Corrige l'accès au rôle d'utilisateur
-        // Si l'utilisateur est admin, récupérer tous les bugs
+    if (user && user.user) {
+      if (user.user.role === 'admin') {
         fetchAllBugs()
-          .then((data) => {
-            setBugs(data);
-          })
+          .then((data) => setBugs(data))
           .catch((err) => console.error('Erreur lors de la récupération de tous les bugs:', err));
       } else {
-        // Pour les utilisateurs non-admin, récupérer les bugs pour le domaine de l'utilisateur
-        const userDomain = user.user.domain; // Corrige l'accès au domaine de l'utilisateur
-        if (!userDomain) {
-          console.error("Erreur : Domaine utilisateur introuvable."); // Log d'erreur si le domaine est introuvable
-          return;
-        }
-        console.log("Domaine de l'utilisateur:", userDomain); // Log du domaine de l'utilisateur
+        const userDomain = user.user.domain;
+        if (!userDomain) return;
         fetchBugs(userDomain);
       }
-    } else {
-      console.error("Erreur : Utilisateur non connecté ou données utilisateur manquantes.");
     }
   }, [user]);
 
   const fetchBugs = async (domain) => {
     try {
-      console.log("Récupération des bugs pour le domaine:", domain); // Log avant la récupération
-      const fetchedBugs = await fetchBugsForDomain(domain); // Récupérer les bugs pour le domaine
-      console.log("Bugs récupérés pour domaine:", fetchedBugs);  // Log des bugs récupérés pour le domaine
-      setBugs(fetchedBugs); // Assigner les bugs récupérés à l'état
+      const fetchedBugs = await fetchBugsForDomain(domain);
+      setBugs(fetchedBugs);
     } catch (err) {
       console.error('Erreur lors de la récupération des bugs:', err);
     }
   };
 
   const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value.toLowerCase()); // Mettre à jour le terme de recherche en minuscules pour une recherche insensible à la casse
+    setSearchTerm(e.target.value.toLowerCase());
   };
 
   const handleSortByDate = () => {
@@ -58,21 +47,30 @@ const DataTable = () => {
         return new Date(b.date) - new Date(a.date);
       }
     });
-    setBugs(sortedBugs); // Mettre à jour les bugs triés
-    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc'); // Inverser l'ordre de tri
+    setBugs(sortedBugs);
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
-  // Filtrer les bugs en fonction du terme de recherche et de la partie du domaine, y compris les sous-domaines
+  const handleShowModal = (screenshotUrl) => {
+    const fileId = screenshotUrl.match(/\/d\/(.*?)\//)[1]; // Extraire l'ID du fichier depuis l'URL Google Drive
+    const directImageUrl = `https://drive.google.com/file/d/${fileId}`; // Créer l'URL directe pour l'image
+    console.log("Direct Image URL: ", directImageUrl); // Log pour vérifier l'URL
+    setSelectedScreenshotUrl(directImageUrl); // Mettre à jour l'URL du screenshot avec l'URL directe
+    setShowModal(true);  // Ouvrir la modal
+  };
+  https://drive.google.com/file/d/1uHuvrvVfM6lFmZ5_y-jH4y5Rxm1P34Fq/view
+  useEffect(() => {
+    console.log("Updated Screenshot URL: ", selectedScreenshotUrl); // Vérification de l'URL mise à jour
+  }, [selectedScreenshotUrl]);
+
   const filteredBugs = bugs.filter((bug) => {
-    const domain = new URL(bug.url).hostname.toLowerCase(); // Extraire le domaine complet (inclut sous-domaines)
-    return domain.includes(searchTerm); // Vérifier si le domaine contient le terme de recherche
+    const domain = new URL(bug.url).hostname.toLowerCase();
+    return domain.includes(searchTerm);
   });
 
   return (
     <div className="data-table">
       <h2>Table des Bugs</h2>
-
-      {/* Barre de recherche pour les admins */}
       {user && user.user.role === 'admin' && (
         <input
           type="text"
@@ -82,7 +80,6 @@ const DataTable = () => {
           style={{ marginBottom: '20px', padding: '10px', width: '100%' }}
         />
       )}
-
       {filteredBugs.length > 0 ? (
         <table>
           <thead>
@@ -93,6 +90,7 @@ const DataTable = () => {
               <th onClick={handleSortByDate} style={{ cursor: 'pointer' }}>
                 Date {sortOrder === 'asc' ? '↑' : '↓'}
               </th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -101,7 +99,11 @@ const DataTable = () => {
                 <td>{bug.url}</td>
                 <td>{bug.description}</td>
                 <td>{bug.impact}</td>
-                <td>{bug.date.substring(0, 10)}</td> 
+                <td>{bug.date.substring(0, 10)}</td>
+                <td>
+                <a href={bug.screenshotUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Voir l'image</a>
+                  <button onClick={() => console.log("Supprimer")}>Supprimer</button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -109,6 +111,11 @@ const DataTable = () => {
       ) : (
         <p>Aucun bug trouvé.</p>
       )}
+      <ScreenModal
+        show={showModal}
+        handleClose={() => setShowModal(false)}
+        screenshotUrl={selectedScreenshotUrl}  // URL du screenshot à afficher dans la modal
+      />
     </div>
   );
 };

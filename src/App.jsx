@@ -5,6 +5,8 @@ import LoginLayout from './Components/Login/Login';
 import Dashboard from './Components/Dashboard/Dashboard';
 import { UserContextProvider, useUser } from './context/UserContext';
 import { fetchUserProfile, handleLogout } from './utils/authApi';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
 
 const App = () => {
   return (
