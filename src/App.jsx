@@ -1,12 +1,11 @@
-// src/App.jsx
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import LoginLayout from './Components/Login/Login';
 import Dashboard from './Components/Dashboard/Dashboard';
 import { UserContextProvider, useUser } from './context/UserContext';
 import { fetchUserProfile, handleLogout } from './utils/authApi';
+import SetupPassword from './Components/SetupPassword/SetupPassword'; // Ajouter ce composant pour la configuration du mot de passe
 import 'bootstrap/dist/css/bootstrap.min.css';
-
 
 const App = () => {
   return (
@@ -69,7 +68,6 @@ const AppRoutes = () => {
           )
         }
       />
-      {/* Route pour le dashboard, toujours accessible si connecté */}
       <Route
         path="/dashboard/*"
         element={
@@ -80,6 +78,7 @@ const AppRoutes = () => {
           )
         }
       />
+      <Route path="/setup-password/:token" element={<SetupPassword />} /> {/* Nouvelle route */}
     </Routes>
   );
 };

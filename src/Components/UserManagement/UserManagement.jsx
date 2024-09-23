@@ -1,44 +1,39 @@
-// src/Components/UserManagement/UserManagement.jsx
 import React, { useState, useEffect } from 'react';
 import { fetchUsers, createUser } from '../../utils/userApi';
-import UserTable from '../UserTable/UserTable'; // Utiliser UserTable
+import UserTable from '../UserTable/UserTable'; 
 import { useUser } from '../../context/UserContext';
 import './UserManagement.css';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
-  const [newUser, setNewUser] = useState({ firstName: '', lastName: '', username: '', email: '', domain: '' });
+  const [newUser, setNewUser] = useState({ email: '', domain: '' });
   const { user } = useUser();
 
-  // Charger les utilisateurs
+  // Charger les utilisateurs si l'utilisateur connecté est un admin
   useEffect(() => {
-    console.log("User state in useEffect:", user);
     if (user && user.user && user.user.role === "admin") {
-      console.log("Admin detected, fetching users...");
       fetchUsers()
         .then((data) => {
-          console.log("Fetched users:", data);
-          setUsers(data); // Problème ici si `data` est `undefined`
+          if (data) {
+            setUsers(data);
+          }
         })
         .catch((err) => {
           console.error("Erreur dans useEffect:", err);
         });
     }
-  }, [user]);
+  }, [user]); // Déclencher uniquement si `user` change
 
   // Créer un nouvel utilisateur
   const handleCreateUser = async () => {
     try {
       const createdUser = await createUser(newUser);
-      setUsers([...users, createdUser]); // Ajouter le nouvel utilisateur à la liste
-      setNewUser({ firstName: '', lastName: '', username: '', email: '', domain: '' }); // Réinitialiser le formulaire
+      setUsers([...users, createdUser]); // Ajouter l'utilisateur créé à la liste
+      setNewUser({ email: '', domain: '' }); // Réinitialiser les champs du formulaire
     } catch (error) {
       if (error.response && error.response.status === 409) {
-        // Gérer le cas où l'email existe déjà
-        console.error("Erreur: L'email existe déjà.");
         alert("Un utilisateur avec cet email existe déjà.");
       } else {
-        // Gérer d'autres erreurs
         console.error('Erreur lors de la création de l\'utilisateur:', error);
       }
     }
@@ -48,29 +43,8 @@ const UserManagement = () => {
     <div>
       <h2>Gestion des utilisateurs</h2>
 
-      {/* Formulaire de création */}
+      {/* Formulaire de création avec uniquement l'e-mail et le domaine */}
       <div className="user-form">
-        <input
-          type="text"
-          placeholder="Prénom"
-          value={newUser.firstName}
-          onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Nom"
-          value={newUser.lastName}
-          onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Surnom"
-          value={newUser.username}
-          onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
-          required
-        />
         <input
           type="email"
           placeholder="Adresse e-mail"
@@ -88,8 +62,8 @@ const UserManagement = () => {
         <button onClick={handleCreateUser}>Créer l'utilisateur</button>
       </div>
 
-      {/* Table des utilisateurs */}
-      <UserTable users={users} /> {/* Passer les utilisateurs à UserTable */}
+      {/* Tableau des utilisateurs */}
+      <UserTable users={users} />
     </div>
   );
 };

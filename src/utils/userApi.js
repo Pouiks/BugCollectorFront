@@ -80,3 +80,29 @@ export const updateUser = async (userId, userData) => {
     throw error;
   }
 };
+
+// src/utils/userApi.js
+// src/utils/userApi.js
+export const updatePassword = async (token, password) => {
+  try {
+    const response = await fetch(`http://localhost:3000/api/users/setup-password/${token}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ password }), // Envoyer le mot de passe
+    });
+
+    if (!response.ok) {
+      throw new Error('Erreur lors de la mise à jour du mot de passe');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du mot de passe:', error);
+    throw error;
+  }
+};
+
+

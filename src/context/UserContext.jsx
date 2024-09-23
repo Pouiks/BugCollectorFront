@@ -1,4 +1,3 @@
-// src/context/UserContext.jsx
 import React, { createContext, useState, useContext } from 'react';
 
 // Créer le contexte utilisateur
@@ -12,11 +11,11 @@ export const UserContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
 
   const loginUser = (userData) => {
-    setUser(userData); // Mettre à jour les données utilisateur après la connexion
+    setUser(userData);
   };
 
   const logoutUser = () => {
-    setUser(null); // Déconnecter l'utilisateur
+    setUser(null);
   };
 
   return (
