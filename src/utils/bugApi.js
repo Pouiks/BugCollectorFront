@@ -15,6 +15,7 @@ export const fetchAllBugs = async () => {
     }
 
     const data = await response.json();
+    console.log("data: ",data)
     return data; // Retourner tous les bugs
   } catch (error) {
     console.error('Erreur lors de la récupération de tous les bugs:', error);
@@ -43,11 +44,7 @@ export const fetchBugsForDomain = async (domain) => {
     console.error('Erreur lors de la récupération des bugs:', error);
     throw error;
   }
-};
-
-
-
-  
+}; 
   
   export const createBug = async (bugData) => {
     const token = localStorage.getItem('token');
@@ -69,6 +66,29 @@ export const fetchBugsForDomain = async (domain) => {
       return data;
     } catch (error) {
       console.error('Erreur lors de la création du bug:', error);
+      throw error;
+    }
+  };
+  
+  export const deleteBugById = async (domain, bugId) => {
+    console.log("Passage avant delete: ",domain, bugId)
+    try {
+      const response = await fetch(`http://localhost:3000/api/bugs/${domain}/bugs/${bugId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include', // Inclure les cookies si nécessaire
+      });
+  
+      if (!response.ok) {
+        throw new Error('Erreur lors de la suppression du bug');
+      }
+  
+      const data = await response.json();
+      return data; // Retourner la réponse pour confirmer la suppression
+    } catch (error) {
+      console.error('Erreur lors de la suppression du bug:', error);
       throw error;
     }
   };

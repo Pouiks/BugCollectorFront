@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { fetchBugsForDomain, fetchAllBugs } from '../../utils/bugApi';
+import { fetchBugsForDomain, fetchAllBugs, deleteBugById } from '../../utils/bugApi';
 import './DataTable.css';
 import { useUser } from '../../context/UserContext';
-import ScreenModal from '../ScreenModal/ScreenModal';
 
 const DataTable = () => {
   const [bugs, setBugs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('desc');
-  const [showModal, setShowModal] = useState(false);
   const [selectedScreenshotUrl, setSelectedScreenshotUrl] = useState(null);
   const { user } = useUser();
 
@@ -34,7 +32,24 @@ const DataTable = () => {
       console.error('Erreur lors de la récupération des bugs:', err);
     }
   };
-
+  const handleDeleteBug = async (domainName, bugId) => {
+    if (!domainName) {
+      console.error('Le domaine est introuvable.');
+      return;
+    }
+  
+    const confirmation = window.confirm('Es-tu sûr de vouloir supprimer ce bug ?');
+    if (!confirmation) return; // Annule si l'utilisateur ne confirme pas
+  
+    try {
+      await deleteBugById(domainName, bugId); // Appel à la fonction API pour supprimer le bug
+      setBugs((prevBugs) => prevBugs.filter((bug) => bug._id !== bugId)); // Mise à jour locale de la liste des bugs
+      console.log('Bug supprimé avec succès');
+    } catch (error) {
+      console.error('Erreur lors de la suppression du bug :', error);
+    }
+  };
+  
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
   };
@@ -51,14 +66,6 @@ const DataTable = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
-  const handleShowModal = (screenshotUrl) => {
-    const fileId = screenshotUrl.match(/\/d\/(.*?)\//)[1]; // Extraire l'ID du fichier depuis l'URL Google Drive
-    const directImageUrl = `https://drive.google.com/file/d/${fileId}`; // Créer l'URL directe pour l'image
-    console.log("Direct Image URL: ", directImageUrl); // Log pour vérifier l'URL
-    setSelectedScreenshotUrl(directImageUrl); // Mettre à jour l'URL du screenshot avec l'URL directe
-    setShowModal(true);  // Ouvrir la modal
-  };
-  https://drive.google.com/file/d/1uHuvrvVfM6lFmZ5_y-jH4y5Rxm1P34Fq/view
   useEffect(() => {
     console.log("Updated Screenshot URL: ", selectedScreenshotUrl); // Vérification de l'URL mise à jour
   }, [selectedScreenshotUrl]);
@@ -101,21 +108,20 @@ const DataTable = () => {
                 <td>{bug.impact}</td>
                 <td>{bug.date.substring(0, 10)}</td>
                 <td>
-                <a href={bug.screenshotUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Voir l'image</a>
-                  <button onClick={() => console.log("Supprimer")}>Supprimer</button>
+                  <a href={bug.screenshotUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Voir l'image</a>
+                  {/* On utilise maintenant le domainName directement récupéré avec les bugs */}
+                  <button onClick={() => handleDeleteBug(bug.domainName, bug._id)}>Supprimer</button>
                 </td>
               </tr>
             ))}
           </tbody>
+
+
         </table>
       ) : (
         <p>Aucun bug trouvé.</p>
       )}
-      <ScreenModal
-        show={showModal}
-        handleClose={() => setShowModal(false)}
-        screenshotUrl={selectedScreenshotUrl}  // URL du screenshot à afficher dans la modal
-      />
+
     </div>
   );
 };
