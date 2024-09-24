@@ -1,59 +1,57 @@
 /* DataTable.css */
 
-.data-table {
-  width: 100%;
-  overflow-x: auto; /* Permettre le défilement horizontal uniquement si nécessaire */
-  margin: 0 auto; /* Centrer le tableau */
-  max-width: 100%;
+/* Largeur fixe pour l'action pour éviter les débordements */
+.data-table th:last-child, .data-table td:last-child {
+  width: 200px; /* Ajuster si nécessaire */
 }
 
-.data-table table {
-  width: 100%;
-  border-collapse: collapse; /* Supprimer les espaces entre les cellules */
-  table-layout: fixed; /* Assurer une largeur de colonne fixe */
-}
-
-.data-table th, .data-table td {
-  padding: 10px;
-  text-align: left;
-  border-bottom: 1px solid #ddd; /* Ligne en bas pour séparer les lignes */
-  word-wrap: break-word; /* Permettre le passage à la ligne pour les longues phrases */
-  white-space: normal; /* Permettre le retour à la ligne */
-  overflow: hidden; /* Cacher le débordement */
-  text-overflow: ellipsis; /* Ajouter des points de suspension si le texte est trop long */
-}
-
-.data-table th {
-  background-color: #f2f2f2; /* Couleur de fond des en-têtes */
-  position: sticky;
-  top: 0; /* Garder l'en-tête collée en haut lors du défilement */
-  z-index: 1;
-}
-
-.data-table tr:hover {
-  background-color: #f5f5f5; /* Changer la couleur de fond lors du survol */
-}
-
-/* Limiter la largeur des colonnes */
+/* Ajustement de la largeur des autres colonnes */
 .data-table th:first-child, .data-table td:first-child {
-  width: 20%; /* Largeur de la première colonne (URL) */
+  width: 30%; /* Largeur de la première colonne (URL) */
 }
 
 .data-table th:nth-child(2), .data-table td:nth-child(2) {
-  width: 50%; /* Largeur de la deuxième colonne (Description) */
+  width: 30%; /* Largeur de la deuxième colonne (Description) */
 }
 
 .data-table th:nth-child(3), .data-table td:nth-child(3) {
   width: 15%; /* Largeur de la troisième colonne (Impact) */
 }
 
-/* Rendre le tableau responsive sur les petits écrans */
-@media (max-width: 768px) {
-  .data-table table {
-    width: 100%;
-  }
+.data-table th:nth-child(4), .data-table td:nth-child(4) {
+  width: 15%; /* Largeur de la colonne Date */
+}
 
-  .data-table th, .data-table td {
-    padding: 8px;
-  }
+.data-table td button {
+  margin-left: 10px; /* Espace entre les boutons */
+}
+
+/* Gérer le débordement horizontal du tableau */
+.data-table {
+  width: 100%;
+  overflow-x: auto; /* Ajout du défilement horizontal uniquement si nécessaire */
+}
+
+.data-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th, .data-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+  word-wrap: break-word; /* Empêcher le débordement des longues URL ou descriptions */
+  white-space: normal; /* Autoriser les retours à la ligne */
+}
+
+.data-table th {
+  background-color: #f2f2f2;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.data-table tr:hover {
+  background-color: #f5f5f5;
 }

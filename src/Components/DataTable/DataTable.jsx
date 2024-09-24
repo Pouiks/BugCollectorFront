@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { fetchBugsForDomain, fetchAllBugs, deleteBugById } from '../../utils/bugApi';
 import './DataTable.css';
 import { useUser } from '../../context/UserContext';
@@ -7,49 +7,67 @@ const DataTable = () => {
   const [bugs, setBugs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('desc');
-  const [selectedScreenshotUrl, setSelectedScreenshotUrl] = useState(null);
+  const [confirmDelete, setConfirmDelete] = useState({}); // Gérer l'état de confirmation
   const { user } = useUser();
+  
+  // Variable pour stocker les bugs temporairement
+  const bugsRef = useRef([]);
 
-  useEffect(() => {
+  // Charger les bugs au chargement initial et après suppression
+  const loadBugs = async () => {
     if (user && user.user) {
-      if (user.user.role === 'admin') {
-        fetchAllBugs()
-          .then((data) => setBugs(data))
-          .catch((err) => console.error('Erreur lors de la récupération de tous les bugs:', err));
-      } else {
-        const userDomain = user.user.domain;
-        if (!userDomain) return;
-        fetchBugs(userDomain);
+      try {
+        let fetchedBugs = [];
+        const userDomain = user.user.domain || null;
+        if (user.user.role === 'admin') {
+          fetchedBugs = await fetchAllBugs();
+        } else if (userDomain) {
+          fetchedBugs = await fetchBugsForDomain(userDomain);
+        }
+        
+        // Comparer avec les bugs actuels et mettre à jour si différent
+        if (JSON.stringify(fetchedBugs) !== JSON.stringify(bugsRef.current)) {
+          bugsRef.current = fetchedBugs;
+          setBugs(fetchedBugs);
+        }
+      } catch (err) {
+        console.error('Erreur lors de la récupération des bugs:', err);
       }
     }
-  }, [user]);
-
-  const fetchBugs = async (domain) => {
-    try {
-      const fetchedBugs = await fetchBugsForDomain(domain);
-      setBugs(fetchedBugs);
-    } catch (err) {
-      console.error('Erreur lors de la récupération des bugs:', err);
-    }
   };
+
+  // Appel au chargement des bugs au démarrage
+  useEffect(() => {
+    loadBugs(); // Charger les bugs
+  }, [user]); // Ne déclenche que si le `user` change
+
+  // Gestion de la suppression des bugs
   const handleDeleteBug = async (domainName, bugId) => {
     if (!domainName) {
       console.error('Le domaine est introuvable.');
       return;
     }
-  
-    const confirmation = window.confirm('Es-tu sûr de vouloir supprimer ce bug ?');
-    if (!confirmation) return; // Annule si l'utilisateur ne confirme pas
-  
+
+    if (!confirmDelete[bugId]) {
+      setConfirmDelete((prev) => ({ ...prev, [bugId]: true })); // Premier clic : on active la confirmation
+      return;
+    }
+
     try {
-      await deleteBugById(domainName, bugId); // Appel à la fonction API pour supprimer le bug
-      setBugs((prevBugs) => prevBugs.filter((bug) => bug._id !== bugId)); // Mise à jour locale de la liste des bugs
+      await deleteBugById(domainName, bugId); // Suppression du bug
+      await loadBugs(); // Recharger les bugs après suppression
       console.log('Bug supprimé avec succès');
     } catch (error) {
       console.error('Erreur lors de la suppression du bug :', error);
     }
+
+    setConfirmDelete((prev) => ({ ...prev, [bugId]: false })); // Réinitialiser la confirmation après suppression
   };
-  
+
+  const handleCancelDelete = (bugId) => {
+    setConfirmDelete((prev) => ({ ...prev, [bugId]: false })); // Annuler la suppression
+  };
+
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
   };
@@ -66,10 +84,6 @@ const DataTable = () => {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
-  useEffect(() => {
-    console.log("Updated Screenshot URL: ", selectedScreenshotUrl); // Vérification de l'URL mise à jour
-  }, [selectedScreenshotUrl]);
-
   const filteredBugs = bugs.filter((bug) => {
     const domain = new URL(bug.url).hostname.toLowerCase();
     return domain.includes(searchTerm);
@@ -78,15 +92,13 @@ const DataTable = () => {
   return (
     <div className="data-table">
       <h2>Table des Bugs</h2>
-      {user && user.user.role === 'admin' && (
-        <input
-          type="text"
-          placeholder="Rechercher par domaine ou sous-domaine..."
-          value={searchTerm}
-          onChange={handleSearchChange}
-          style={{ marginBottom: '20px', padding: '10px', width: '100%' }}
-        />
-      )}
+      <input
+        type="text"
+        placeholder="Rechercher par domaine ou sous-domaine..."
+        value={searchTerm}
+        onChange={handleSearchChange}
+        style={{ marginBottom: '20px', padding: '10px', width: '100%' }}
+      />
       {filteredBugs.length > 0 ? (
         <table>
           <thead>
@@ -107,21 +119,32 @@ const DataTable = () => {
                 <td>{bug.description}</td>
                 <td>{bug.impact}</td>
                 <td>{bug.date.substring(0, 10)}</td>
-                <td>
-                  <a href={bug.screenshotUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">Voir l'image</a>
-                  {/* On utilise maintenant le domainName directement récupéré avec les bugs */}
-                  <button onClick={() => handleDeleteBug(bug.domainName, bug._id)}>Supprimer</button>
+                <td style={{ display: 'flex', minWidth: '100px' }}>
+                  <a href={bug.screenshotUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                    Voir l'image
+                  </a>
+                  {confirmDelete[bug._id] ? (
+                    <>
+                      <button className="btn btn-danger" onClick={() => handleDeleteBug(bug.domainName, bug._id)}>
+                        Confirmer
+                      </button>
+                      <button className="btn btn-secondary" onClick={() => handleCancelDelete(bug._id)}>
+                        Annuler
+                      </button>
+                    </>
+                  ) : (
+                    <button className="btn btn-danger" onClick={() => handleDeleteBug(bug.domainName, bug._id)}>
+                      Supprimer
+                    </button>
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
-
-
         </table>
       ) : (
         <p>Aucun bug trouvé.</p>
       )}
-
     </div>
   );
 };
