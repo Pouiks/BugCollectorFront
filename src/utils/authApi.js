@@ -1,5 +1,6 @@
 // utils/authApi.js
 
+// Fonction pour se connecter
 export const handleLogin = async (email, password) => {
   try {
     const response = await fetch('http://localhost:3000/api/auth/login', {
@@ -7,8 +8,6 @@ export const handleLogin = async (email, password) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // Permet d'envoyer les cookies
-
       body: JSON.stringify({ email, password }),
     });
 
@@ -17,11 +16,9 @@ export const handleLogin = async (email, password) => {
     }
 
     const data = await response.json();
-    
-    // Stocker le token dans le contexte utilisateur ou localStorage
-    localStorage.setItem('token', data.token); // Si ton backend renvoie un token dans `data.token`
-    
-    return data; // Retourner les données de l'utilisateur
+    // Stocker le token dans le localStorage après login réussi
+    localStorage.setItem('token', data.token);  
+    return data;  // Retourner les données utilisateur
   } catch (error) {
     console.error('Erreur lors de la connexion:', error);
     throw error;
@@ -29,16 +26,14 @@ export const handleLogin = async (email, password) => {
 };
 
 
+// Fonction pour récupérer le profil utilisateur
 export const fetchUserProfile = async () => {
   try {
-    const token = localStorage.getItem('token'); // Récupérer le token
-
     const response = await fetch('http://localhost:3000/api/auth/profile', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, // Ajouter le token dans l'en-tête Authorization
-
+        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Inclure le token dans l'en-tête
       },
       credentials: 'include', // Inclure les cookies dans la requête
     });
@@ -66,12 +61,13 @@ export const handleLogout = async () => {
     if (!response.ok) {
       throw new Error('Erreur lors de la déconnexion');
     }
-    localStorage.removeItem('token'); // Supprimer le token du localStorage
 
+    // Supprimer le token du localStorage lors de la déconnexion
+    localStorage.removeItem('token');
+    
     return response.json();
   } catch (error) {
     console.error('Erreur lors de la déconnexion:', error);
     throw error;
   }
 };
-

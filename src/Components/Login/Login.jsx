@@ -14,11 +14,13 @@ const Login = () => {
     e.preventDefault();
     try {
       const userData = await handleLogin(email, password); // Authentification avec l'API
+      localStorage.setItem('token', userData.token); // Stocker le token dans le localStorage
       loginUser(userData); // Mettre à jour le contexte avec les données de l'utilisateur
     } catch (err) {
       setError('Erreur lors de la connexion. Veuillez vérifier vos informations.');
     }
   };
+  
 
   const showPassword = () => {
     const passwordInput = document.getElementById("passwordInput");
