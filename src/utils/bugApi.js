@@ -15,7 +15,7 @@ export const fetchAllBugs = async () => {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`, // Ajouter le token dans l'en-tête Authorization
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
       credentials: 'include', // Inclure les cookies pour l'authentification
     });
