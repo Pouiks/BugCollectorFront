@@ -7,6 +7,7 @@ const DataTable = () => {
   const [bugs, setBugs] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortOrder, setSortOrder] = useState('desc');
+  const [sortBy, setSortBy] = useState('date'); // Ajout d'un état pour trier par date ou impact
   const [confirmDelete, setConfirmDelete] = useState({}); // Gérer l'état de confirmation
   const { user } = useUser();
   
@@ -47,12 +48,18 @@ const DataTable = () => {
       console.error('Le domaine est introuvable.');
       return;
     }
-
+  
     if (!confirmDelete[bugId]) {
       setConfirmDelete((prev) => ({ ...prev, [bugId]: true })); // Premier clic : on active la confirmation
+  
+      // Timeout de 4 secondes pour réinitialiser l'état si pas de confirmation
+      setTimeout(() => {
+        setConfirmDelete((prev) => ({ ...prev, [bugId]: false }));
+      }, 4000);
+  
       return;
     }
-
+  
     try {
       await deleteBugById(domainName, bugId); // Suppression du bug
       await loadBugs(); // Recharger les bugs après suppression
@@ -60,18 +67,16 @@ const DataTable = () => {
     } catch (error) {
       console.error('Erreur lors de la suppression du bug :', error);
     }
-
+  
     setConfirmDelete((prev) => ({ ...prev, [bugId]: false })); // Réinitialiser la confirmation après suppression
   };
-
-  const handleCancelDelete = (bugId) => {
-    setConfirmDelete((prev) => ({ ...prev, [bugId]: false })); // Annuler la suppression
-  };
+  
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
   };
 
+  // Fonction pour trier par date
   const handleSortByDate = () => {
     const sortedBugs = [...bugs].sort((a, b) => {
       if (sortOrder === 'asc') {
@@ -82,6 +87,22 @@ const DataTable = () => {
     });
     setBugs(sortedBugs);
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    setSortBy('date'); // Indiquer que le tri se fait par date
+  };
+
+  // Fonction pour trier par impact
+  const handleSortByImpact = () => {
+    const sortedBugs = [...bugs].sort((a, b) => {
+      const impactOrder = ['Peu gênant', 'Perturbant', 'Grave']; // Ordre de tri des impacts
+      if (sortOrder === 'asc') {
+        return impactOrder.indexOf(a.impact) - impactOrder.indexOf(b.impact);
+      } else {
+        return impactOrder.indexOf(b.impact) - impactOrder.indexOf(a.impact);
+      }
+    });
+    setBugs(sortedBugs);
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    setSortBy('impact'); // Indiquer que le tri se fait par impact
   };
 
   const filteredBugs = bugs.filter((bug) => {
@@ -105,9 +126,11 @@ const DataTable = () => {
             <tr>
               <th>URL</th>
               <th>Description</th>
-              <th>Impact</th>
+              <th onClick={handleSortByImpact} style={{ cursor: 'pointer' }}>
+                Impact {sortBy === 'impact' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
+              </th>
               <th onClick={handleSortByDate} style={{ cursor: 'pointer' }}>
-                Date {sortOrder === 'asc' ? '↑' : '↓'}
+                Date {sortBy === 'date' ? (sortOrder === 'asc' ? '↑' : '↓') : ''}
               </th>
               <th>Action</th>
             </tr>
@@ -133,7 +156,7 @@ const DataTable = () => {
                       </button>
                     </>
                   ) : (
-                    <button className="btn btn-danger" onClick={() => handleDeleteBug(bug.domainName, bug._id)}>
+                    <button className="btn btn-warning" onClick={() => handleDeleteBug(bug.domainName, bug._id)}>
                       Supprimer
                     </button>
                   )}
