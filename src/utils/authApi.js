@@ -1,12 +1,14 @@
 // utils/authApi.js
 
-const handleLogin = async (email, password) => {
+export const handleLogin = async (email, password) => {
   try {
     const response = await fetch('http://localhost:3000/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // Permet d'envoyer les cookies
+
       body: JSON.stringify({ email, password }),
     });
 
