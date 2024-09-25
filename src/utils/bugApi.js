@@ -9,7 +9,6 @@ export const fetchAllBugs = async () => {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`, // Ajouter le token dans l'en-tête Authorization
-
       },
       credentials: 'include', // Inclure les cookies pour l'authentification
     });
@@ -19,13 +18,13 @@ export const fetchAllBugs = async () => {
     }
 
     const data = await response.json();
-    console.log("data: ",data)
-    return data; // Retourner tous les bugs
+    return data;
   } catch (error) {
     console.error('Erreur lors de la récupération de tous les bugs:', error);
     throw error;
   }
 };
+
 
 
 export const fetchBugsForDomain = async (domain) => {

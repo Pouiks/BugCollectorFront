@@ -9,6 +9,7 @@ export const handleLogin = async (email, password) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ email, password }),
+      credentials: 'include', // Inclure les cookies dans la requête
     });
 
     if (!response.ok) {
@@ -16,14 +17,15 @@ export const handleLogin = async (email, password) => {
     }
 
     const data = await response.json();
-    // Stocker le token dans le localStorage après login réussi
-    localStorage.setItem('token', data.token);  
-    return data;  // Retourner les données utilisateur
+    localStorage.setItem('token', data.token); // Stocker le token dans le localStorage
+
+    return data; // Retourner les données de l'utilisateur
   } catch (error) {
     console.error('Erreur lors de la connexion:', error);
-    throw error;
+    throw error; // Renvoyer l'erreur
   }
 };
+
 
 
 // Fonction pour récupérer le profil utilisateur
