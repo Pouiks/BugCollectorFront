@@ -9,17 +9,22 @@ export const useUser = () => useContext(UserContext);
 // Fournisseur de Contexte
 export const UserContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);  // Stocker le token ici
 
-  const loginUser = (userData) => {
+  const loginUser = (userData, authToken) => {
     setUser(userData);
+    setToken(authToken);  // Stocker le token lors du login
+    localStorage.setItem('token', authToken);  // Optionnel : stocker dans localStorage pour persistance
   };
 
   const logoutUser = () => {
     setUser(null);
+    setToken(null);
+    localStorage.removeItem('token');  // Nettoyer le localStorage lors du logout
   };
 
   return (
-    <UserContext.Provider value={{ user, loginUser, logoutUser }}>
+    <UserContext.Provider value={{ user, token, loginUser, logoutUser }}>
       {children}
     </UserContext.Provider>
   );

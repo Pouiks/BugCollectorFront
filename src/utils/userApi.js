@@ -85,10 +85,14 @@ export const updateUser = async (userId, userData) => {
 // src/utils/userApi.js
 export const updatePassword = async (token, password) => {
   try {
+    const token = localStorage.getItem('token'); // Récupère le token depuis le localStorage
+
     const response = await fetch(`http://localhost:3000/api/users/setup-password/${token}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, // Ajouter le token dans l'en-tête Authorization
+
       },
       body: JSON.stringify({ password }), // Envoyer le mot de passe
     });

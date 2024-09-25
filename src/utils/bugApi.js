@@ -2,10 +2,14 @@
 // utils/bugApi.js
 export const fetchAllBugs = async () => {
   try {
+    const token = localStorage.getItem('token'); // Récupère le token depuis le localStorage
+
     const response = await fetch('http://localhost:3000/api/bugs/all', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, // Ajouter le token dans l'en-tête Authorization
+
       },
       credentials: 'include', // Inclure les cookies pour l'authentification
     });
@@ -25,11 +29,15 @@ export const fetchAllBugs = async () => {
 
 
 export const fetchBugsForDomain = async (domain) => {
+  const token = localStorage.getItem('token'); // Récupère le token depuis le localStorage
+
   try {
     const response = await fetch(`http://localhost:3000/api/bugs/domain/${domain}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, // Ajouter le token dans l'en-tête Authorization
+
       },
       credentials: 'include', // Inclure les cookies pour l'authentification si nécessaire
     });
@@ -73,10 +81,15 @@ export const fetchBugsForDomain = async (domain) => {
   export const deleteBugById = async (domain, bugId) => {
     console.log("Passage avant delete: ",domain, bugId)
     try {
+      const token = localStorage.getItem('token'); // Récupère le token depuis le localStorage
+
       const response = await fetch(`http://localhost:3000/api/bugs/${domain}/bugs/${bugId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`, // Ajouter le token dans l'en-tête Authorization
+
+          
         },
         credentials: 'include', // Inclure les cookies si nécessaire
       });
