@@ -1,23 +1,14 @@
 // utils/bugApi.js
 // utils/bugApi.js
+// fetchAllBugs.js
 export const fetchAllBugs = async () => {
   try {
-    const token = document.cookie
-      .split('; ')
-      .find(row => row.startsWith('token='))
-      ?.split('=')[1]; // Récupérer le token depuis les cookies
-
-    if (!token) {
-      throw new Error('Token manquant.');
-    }
-
     const response = await fetch('http://localhost:3000/api/bugs/all', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
-      credentials: 'include', // Inclure les cookies pour l'authentification
+      credentials: 'include', // Indispensable pour inclure les cookies
     });
 
     if (!response.ok) {
@@ -25,12 +16,13 @@ export const fetchAllBugs = async () => {
     }
 
     const data = await response.json();
-    return data;
+    return data; // Retourner tous les bugs
   } catch (error) {
     console.error('Erreur lors de la récupération de tous les bugs:', error);
     throw error;
   }
 };
+
 
 
 

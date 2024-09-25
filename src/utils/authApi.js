@@ -11,7 +11,7 @@ export const handleLogin = async (email, password) => {
       body: JSON.stringify({ email, password }),
       credentials: 'include', // Inclure les cookies dans la requête
     });
-
+    console.log("response handleLogin: ", response)
     if (!response.ok) {
       throw new Error('Erreur lors de la connexion');
     }
@@ -28,16 +28,15 @@ export const handleLogin = async (email, password) => {
 
 
 
-// Fonction pour récupérer le profil utilisateur
+// utils/authApi.js
 export const fetchUserProfile = async () => {
   try {
     const response = await fetch('http://localhost:3000/api/auth/profile', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`, // Inclure le token dans l'en-tête
       },
-      credentials: 'include', // Inclure les cookies dans la requête
+      credentials: 'include', // On inclut les cookies
     });
 
     if (!response.ok) {
@@ -51,6 +50,7 @@ export const fetchUserProfile = async () => {
     throw error;
   }
 };
+
 
 // Fonction pour la déconnexion
 export const handleLogout = async () => {
