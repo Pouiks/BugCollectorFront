@@ -2,7 +2,14 @@
 // utils/bugApi.js
 export const fetchAllBugs = async () => {
   try {
-    const token = localStorage.getItem('token'); // Récupère le token depuis le localStorage
+    const token = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='))
+      ?.split('=')[1]; // Récupérer le token depuis les cookies
+
+    if (!token) {
+      throw new Error('Token manquant.');
+    }
 
     const response = await fetch('http://localhost:3000/api/bugs/all', {
       method: 'GET',
@@ -24,6 +31,7 @@ export const fetchAllBugs = async () => {
     throw error;
   }
 };
+
 
 
 
