@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom'; // Utiliser useNavigate pour la redirection
 import { updatePassword } from '../../utils/userApi';
-
+import './SetupPassword.css'
 const SetupPassword = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -33,13 +33,14 @@ const SetupPassword = () => {
   };
 
   return (
-    <div>
+    <div className='setup-password_container'>
       <h2>Configurer votre mot de passe</h2>
       {error && <p style={{ color: 'red' }}>{error}</p>}
       {success ? (
         <p>Mot de passe mis à jour avec succès ! Vous serez redirigé vers la page de login.</p>
       ) : (
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className='setup-password_form'>
+          <label htmlFor="" style={{color:"white", fontWeight:"600"}}>Nouveau mot de passe</label>
           <input
             type="password"
             placeholder="Nouveau mot de passe"
@@ -47,6 +48,7 @@ const SetupPassword = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <label htmlFor="" style={{color:"white", fontWeight:"600"}}>Confirmez le mot de passe</label>
           <input
             type="password"
             placeholder="Confirmer le mot de passe"
@@ -54,7 +56,7 @@ const SetupPassword = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
-          <button type="submit">Valider</button>
+          <button className='btn btn-success' type="submit">Valider</button>
         </form>
       )}
     </div>
