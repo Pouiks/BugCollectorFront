@@ -1,4 +1,5 @@
 const API_BASE_URL = 'http://ec2-13-53-152-16.eu-north-1.compute.amazonaws.com:3000/api/users';
+import { useUser } from './UserContext';
 
 // Fonction pour récupérer tous les utilisateurs
 export const fetchUsers = async () => {
