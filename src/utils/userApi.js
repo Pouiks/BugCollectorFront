@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000/api/users';
+const API_BASE_URL = 'http://ec2-13-53-152-16.eu-north-1.compute.amazonaws.com:3000/api/users';
 
 // Fonction pour récupérer tous les utilisateurs
 export const fetchUsers = async () => {
@@ -87,7 +87,7 @@ export const updatePassword = async (token, password) => {
   try {
     const token = localStorage.getItem('token'); // Récupère le token depuis le localStorage
 
-    const response = await fetch(`http://localhost:3000/api/users/setup-password/${token}`, {
+    const response = await fetch(`http://ec2-13-53-152-16.eu-north-1.compute.amazonaws.com:3000/api/users/setup-password/${token}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

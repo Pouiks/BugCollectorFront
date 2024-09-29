@@ -8,14 +8,14 @@ const UserDetail = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:3000/api/users/${id}`)
+    fetch(`http://ec2-13-53-152-16.eu-north-1.compute.amazonaws.com:3000/api/users/${id}`)
       .then(response => response.json())
       .then(data => setUser(data))
       .catch(error => console.error('Erreur lors de la récupération de l\'utilisateur:', error));
   }, [id]);
 
   const handleSubmit = () => {
-    fetch(`http://localhost:3000/api/users/${id}`, {
+    fetch(`http://ec2-13-53-152-16.eu-north-1.compute.amazonaws.com:3000/api/users/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'

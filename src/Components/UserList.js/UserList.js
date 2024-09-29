@@ -6,7 +6,7 @@ const UserList = () => {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    fetch('http://localhost:3000/api/users')
+    fetch('http://ec2-13-53-152-16.eu-north-1.compute.amazonaws.com:3000/api/users')
       .then(response => response.json())
       .then(data => setUsers(data))
       .catch(error => console.error('Erreur lors de la récupération des utilisateurs:', error));

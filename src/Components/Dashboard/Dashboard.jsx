@@ -9,6 +9,7 @@ import './Dashboard.css';
 
 const Dashboard = ({ onLogout }) => {
   const { user } = useUser();
+  console.log(user)
 
   if (!user || !user.user) {
     return <p>Chargement...</p>;
@@ -18,16 +19,15 @@ const Dashboard = ({ onLogout }) => {
 
   return (
     <div className="dashboard">
-      {/* Sidebar toujours affichée */}
       <Sidebar onLogout={onLogout} />
       <div className="content">
         <h2>Welcome, {finalUser.username}!</h2>
 
         {/* Routes internes pour naviguer entre DataTable et UserManagement */}
         <Routes>
-          <Route path="/" element={<Navigate to="datatable" />} />
-          <Route path="datatable" element={<DataTable />} />
-          <Route path="users" element={<UserManagement />} />
+          <Route path="/" element={<Navigate to="datatable" user={user}/>} />
+          <Route path="datatable" element={<DataTable user={user}/>} />
+          <Route path="users" element={<UserManagement user={user}/>} />
         </Routes>
       </div>
     </div>

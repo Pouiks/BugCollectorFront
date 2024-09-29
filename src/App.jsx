@@ -4,8 +4,6 @@ import LoginLayout from './Components/Login/Login';
 import Dashboard from './Components/Dashboard/Dashboard';
 import { UserContextProvider, useUser } from './context/UserContext';
 import { fetchUserProfile, handleLogout } from './utils/authApi';
-import SetupPassword from './Components/SetupPassword/SetupPassword'; // Ajouter ce composant pour la configuration du mot de passe
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const App = () => {
   return (
@@ -20,37 +18,26 @@ const App = () => {
 const AppRoutes = () => {
   const { user, loginUser, logoutUser } = useUser();
   const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
     const checkUserLoggedIn = async () => {
       try {
-        setLoading(true);
-        const userData = await fetchUserProfile();
-        if (userData && userData.username) {
-          loginUser({ user: userData });
+        const token = localStorage.getItem('token');
+        if (token) {
+          const userData = await fetchUserProfile(); // Appel à l'API pour récupérer le profil utilisateur
+          if (userData && userData.username) {
+            loginUser(userData, token); // Mettre à jour l'état utilisateur et token
+          }
         }
       } catch (error) {
         console.error('Erreur lors de la vérification de l\'utilisateur connecté :', error);
       } finally {
         setLoading(false);
-        setInitialized(true);
       }
     };
 
-    if (!initialized) {
-      checkUserLoggedIn();
-    }
-  }, [loginUser, initialized]);
-
-  const handleLogoutClick = async () => {
-    try {
-      await handleLogout();
-      logoutUser();
-    } catch (error) {
-      console.error('Erreur lors de la déconnexion :', error);
-    }
-  };
+    checkUserLoggedIn(); // Vérifiez une seule fois si l'utilisateur est logué
+  }, [loginUser]);
 
   if (loading) {
     return <p>Chargement...</p>;
@@ -60,25 +47,12 @@ const AppRoutes = () => {
     <Routes>
       <Route
         path="/"
-        element={
-          user ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <LoginLayout onLogin={loginUser} />
-          )
-        }
+        element={user ? <Navigate to="/dashboard" replace /> : <LoginLayout />}
       />
       <Route
         path="/dashboard/*"
-        element={
-          user ? (
-            <Dashboard onLogout={handleLogoutClick} />
-          ) : (
-            <Navigate to="/" replace />
-          )
-        }
+        element={user ? <Dashboard onLogout={logoutUser} /> : <Navigate to="/" replace />}
       />
-      <Route path="/setup-password/:token" element={<SetupPassword />} /> {/* Nouvelle route */}
     </Routes>
   );
 };

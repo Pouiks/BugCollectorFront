@@ -1,9 +1,10 @@
 // utils/authApi.js
+import { useUser } from '../context/UserContext';
 
 // Fonction pour se connecter
 export const handleLogin = async (email, password) => {
   try {
-    const response = await fetch('http://localhost:3000/api/auth/login', {
+    const response = await fetch('http://ec2-13-53-152-16.eu-north-1.compute.amazonaws.com:3000/api/auth/login', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -27,49 +28,44 @@ export const handleLogin = async (email, password) => {
 };
 
 
-
 // utils/authApi.js
+
 export const fetchUserProfile = async () => {
-  try {
-    const response = await fetch('http://localhost:3000/api/auth/profile', {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include', // On inclut les cookies
-    });
-
-    if (!response.ok) {
-      throw new Error('Erreur lors de la récupération du profil utilisateur');
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error('Erreur lors de la récupération du profil utilisateur:', error);
-    throw error;
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('Token manquant dans localStorage');
   }
+
+  const response = await fetch('http://ec2-13-53-152-16.eu-north-1.compute.amazonaws.com:3000/api/auth/profile', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`, // Envoyer le token via l'en-tête Authorization
+    },
+    credentials: 'include' // Utilisation des cookies si nécessaire
+  });
+
+  if (!response.ok) {
+    throw new Error('Erreur lors de la récupération du profil utilisateur');
+  }
+
+  const data = await response.json();
+  return data;
 };
+
 
 
 // Fonction pour la déconnexion
 export const handleLogout = async () => {
-  try {
-    const response = await fetch(`http://localhost:3000/api/auth/logout`, {
-      method: 'POST',
-      credentials: 'include', // Assurez-vous que le cookie est inclus
-    });
+  const response = await fetch('http://ec2-13-53-152-16.eu-north-1.compute.amazonaws.com:3000/api/auth/logout', {
+    method: 'POST',
+    credentials: 'include'
+  });
 
-    if (!response.ok) {
-      throw new Error('Erreur lors de la déconnexion');
-    }
-
-    // Supprimer le token du localStorage lors de la déconnexion
-    localStorage.removeItem('token');
-    
-    return response.json();
-  } catch (error) {
-    console.error('Erreur lors de la déconnexion:', error);
-    throw error;
+  if (!response.ok) {
+    throw new Error('Erreur lors de la déconnexion');
   }
+
+  // Supprimer le token du localStorage lors de la déconnexion
+  localStorage.removeItem('token');
 };

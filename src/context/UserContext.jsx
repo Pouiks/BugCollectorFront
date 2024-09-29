@@ -1,3 +1,4 @@
+// context/UserContext.jsx
 import React, { createContext, useState, useContext } from 'react';
 
 // Créer le contexte utilisateur
@@ -14,12 +15,12 @@ export const UserContextProvider = ({ children }) => {
   const loginUser = (userData, authToken) => {
     setUser(userData);
     setToken(authToken);  // Stocker le token lors du login
-    localStorage.setItem('token', authToken);  // Optionnel : stocker dans localStorage pour persistance
+    localStorage.setItem('token', authToken);  // Stocker dans localStorage pour persistance
   };
 
   const logoutUser = () => {
     setUser(null);
-    setToken(null);
+    setToken(null);  // Supprimer le token du contexte
     localStorage.removeItem('token');  // Nettoyer le localStorage lors du logout
   };
 
